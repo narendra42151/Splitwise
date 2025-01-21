@@ -20,6 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   // Function to check user session and navigate accordingly
   Future<void> _checkUserSession() async {
+    await Future.delayed(Duration(seconds: 3));
     final accessToken = await SecureTokenManager()
         .getAccessToken(); // Get the saved access token
 

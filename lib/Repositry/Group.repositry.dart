@@ -1,5 +1,5 @@
-import 'package:splitwise/data/Network/network_api.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
+import 'package:splitwise/data/Network/network_api.dart';
 
 class GroupRepository {
   final NetworkApiServices _apiServices = NetworkApiServices();
@@ -65,6 +65,28 @@ class GroupRepository {
       return response['data'];
     } catch (e) {
       throw Exception('Failed to update group details: $e');
+    }
+  }
+
+  Future<bool> checkContactInDatabase(String phoneNumber) async {
+    try {
+      final Map<String, dynamic> data = {'phoneNumber': phoneNumber};
+
+      // API call to check the contact
+      final response = await _apiServices.postApi(data, '/check-phoneNumber');
+
+      if (response == null || !response.containsKey('data')) {
+        throw Exception('Invalid response from server');
+      }
+
+      final exists = response['data']['exists'];
+      if (exists == null || exists is! bool) {
+        throw Exception('Response does not contain a valid "exists" field');
+      }
+
+      return exists;
+    } catch (e) {
+      throw Exception('Failed to check contact in database: $e');
     }
   }
 }

@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Repositry/Group.repositry.dart';
 
 class GroupController extends GetxController {
   RxList<CustomContact> allContacts = <CustomContact>[].obs;
   RxList<CustomContact> selectedContacts = <CustomContact>[].obs;
-
+  final GroupRepository _repository = GroupRepository();
+  final RxBool isLoading = false.obs;
+  final RxString error = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -51,22 +55,51 @@ class GroupController extends GetxController {
   }
 
   Future<void> validateContact(CustomContact contact) async {
-    final isInDatabase = await checkContactInDatabase(contact.phoneNumber);
-    if (isInDatabase) {
-      selectedContacts.add(contact);
-    } else {
-      Get.snackbar(
-        "Contact Not Found",
-        "${contact.displayName} is not registered.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
+    try {
+      isLoading.value = true;
+      error.value = '';
 
-  Future<bool> checkContactInDatabase(String phoneNumber) async {
-    // Simulate API call for validation
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-    return phoneNumber.endsWith('5'); // Example validation logic
+      // Remove all non-numeric characters from the phone number
+      var phoneNumber = contact.phoneNumber.replaceAll(RegExp(r'\D'), '');
+      print(phoneNumber);
+
+      // Check if the contact is in the database
+      final isInDatabase =
+          await _repository.checkContactInDatabase(phoneNumber);
+
+      if (isInDatabase) {
+        selectedContacts.add(contact);
+
+        // Show success message
+        Get.snackbar(
+          "Contact Added",
+          "${contact.displayName} has been added to the list.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        // Show error message
+        Get.snackbar(
+          "Contact Not Found",
+          "${contact.displayName} is not registered.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      error.value = e.toString();
+      Get.snackbar(
+        "Error",
+        error.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void createGroup() {
