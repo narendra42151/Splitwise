@@ -13,8 +13,11 @@ class _TestScreen extends State<Testscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [Text("Home Screen")],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text("Test Screen")],
+        ),
       ),
     );
   }

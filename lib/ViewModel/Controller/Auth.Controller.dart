@@ -100,7 +100,8 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> changePassword(String oldPassword, String newPassword) async {
+  Future<void> changePassword(
+      {required String oldPassword, required String newPassword}) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -111,7 +112,7 @@ class AuthController extends GetxController {
           backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to change password',
+      Get.snackbar('Error', e.toString(),
           backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading.value = false;

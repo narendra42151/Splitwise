@@ -95,12 +95,17 @@ class AuthRepository {
 
   Future<void> changePassword(String oldPassword, String newPassword) async {
     try {
+      final accessToken = await _tokenManager.getAccessToken();
       final Map<String, dynamic> data = {
         'oldPassword': oldPassword,
         'newPassword': newPassword
       };
+      final Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
 
-      await _apiServices.putApi(data, '/user/update');
+      await _apiServices.postApiWithHeaders(data, '/change-password', headers);
     } catch (e) {
       throw Exception('Password change failed: $e');
     }
@@ -108,27 +113,15 @@ class AuthRepository {
 
   Future<UserModel> getUserDetails() async {
     try {
-      // Retrieve the access token
       final accessToken = await _tokenManager.getAccessToken();
 
-      // Prepare headers with the access token
       final Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       };
 
-      // Fetch user details from API with headers
       final response =
           await _apiServices.getApiWithHeaders('/get-user', headers);
-      print(response);
-// final Map<String, dynamic>? jsonResponse =
-//           response as Map<String, dynamic>?;
-
-//       if (jsonResponse == null || !jsonResponse.containsKey('data')) {
-//         throw Exception('Invalid response format');
-//       }
-
-//       final user = jsonResponse['data']['user'];
 
       final Map<String, dynamic>? jsonResponse =
           response as Map<String, dynamic>?;

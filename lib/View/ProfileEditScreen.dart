@@ -178,7 +178,7 @@ class ProfileEditScreen extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           // Navigate to change password screen
-                          Get.toNamed('/change-password');
+                          Get.toNamed('/updatePassword');
                         },
                         child: Text(
                           'Change Password',

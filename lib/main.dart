@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:splitwise/Comman/Colors.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
+import 'package:splitwise/View/ChangePasswordScreen.dart';
+import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/View/LoginScreen.dart';
 import 'package:splitwise/View/ProfileEditScreen.dart';
 import 'package:splitwise/View/RegisterScreen.dart';
-import 'package:splitwise/View/TestScreen.dart';
+
 // import 'package:splitwise/View/HomeScreen.dart'; // Replace this with your actual HomeScreen
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
@@ -105,12 +107,17 @@ class MyApp extends StatelessWidget {
             GetPage(
               name: '/home',
               // page: () => HomeScreen(), // Corrected to use HomeScreen
-              page: () => Testscreen(),
+              page: () => HomeScreen(),
               transition: Transition.fadeIn,
             ),
             GetPage(
               name: '/profile/edit',
               page: () => ProfileEditScreen(),
+              transition: Transition.rightToLeft,
+            ),
+            GetPage(
+              name: '/updatePassword',
+              page: () => ChangePasswordScreen(),
               transition: Transition.rightToLeft,
             ),
           ],
