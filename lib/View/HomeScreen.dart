@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Comman/Colors.dart';
+import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
 import 'package:splitwise/ViewModel/Controller/HomeController.dart';
@@ -155,6 +156,15 @@ class HomeScreen extends StatelessWidget {
                         },
                       ),
                     ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                final _tokenManager = SecureTokenManager();
+                await _tokenManager.clearTokens();
+                Get.offAllNamed("/login");
+              },
+              icon: const Icon(Icons.contacts),
+              label: const Text("Logout"),
             ),
           ],
         ),
