@@ -121,4 +121,33 @@ class AuthController extends GetxController {
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
+
+  Future<void> getUserDetails() async {
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      // Fetch user details from repository
+      final userDetails = await _repository.getUserDetails();
+
+      // Update the user state
+      user.value = userDetails;
+
+      // You can handle any additional logic here (e.g., navigating to a different screen if needed)
+    } catch (e) {
+      error.value = e.toString();
+      print(error.value);
+      // Show error in a Snackbar
+      Get.toNamed("/login");
+      Get.snackbar(
+        "Error", // Title
+        error.value, // Message
+        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
+        backgroundColor: Colors.red, // Background color of the Snackbar
+        colorText: Colors.white, // Text color
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }
