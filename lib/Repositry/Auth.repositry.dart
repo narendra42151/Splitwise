@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:splitwise/Models/UserModel.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/data/Network/network_api.dart';
 
 class AuthRepository {
   final NetworkApiServices _apiServices = NetworkApiServices();
+  final _tokenManager = SecureTokenManager();
 
   Future<UserModel> registerUser(String username, String profilePicture,
       String phoneNumber, String password) async {
@@ -59,8 +58,8 @@ class AuthRepository {
       final refreshToken = jsonResponse['data']['refreshToken'];
 
       // Securely store tokens
-      final tokenManager = SecureTokenManager();
-      await tokenManager.saveTokens(accessToken, refreshToken);
+
+      await _tokenManager.saveTokens(accessToken, refreshToken);
       return {
         'user': UserModel.fromJson(user),
         'accessToken': accessToken,
@@ -104,6 +103,48 @@ class AuthRepository {
       await _apiServices.putApi(data, '/user/update');
     } catch (e) {
       throw Exception('Password change failed: $e');
+    }
+  }
+
+  Future<UserModel> getUserDetails() async {
+    try {
+      // Retrieve the access token
+      final accessToken = await _tokenManager.getAccessToken();
+
+      // Prepare headers with the access token
+      final Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      // Fetch user details from API with headers
+      final response =
+          await _apiServices.getApiWithHeaders('/get-user', headers);
+      print(response);
+// final Map<String, dynamic>? jsonResponse =
+//           response as Map<String, dynamic>?;
+
+//       if (jsonResponse == null || !jsonResponse.containsKey('data')) {
+//         throw Exception('Invalid response format');
+//       }
+
+//       final user = jsonResponse['data']['user'];
+
+      final Map<String, dynamic>? jsonResponse =
+          response as Map<String, dynamic>?;
+
+      if (jsonResponse == null || !jsonResponse.containsKey('data')) {
+        throw Exception('Invalid response format');
+      }
+
+      final user = jsonResponse['data'];
+      if (user == null) {
+        throw Exception('User data is null');
+      }
+
+      return UserModel.fromJson(user);
+    } catch (e) {
+      throw Exception('Failed to fetch user details: $e');
     }
   }
 }

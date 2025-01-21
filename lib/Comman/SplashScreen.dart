@@ -1,22 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Comman/Colors.dart';
+import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
   final AuthController authController = Get.find();
 
   @override
-  Widget build(BuildContext context) {
-    // Start navigation timer
-    Future.delayed(Duration(seconds: 3), () {
-      if (authController.user.value != null) {
+  void initState() {
+    super.initState();
+    _checkUserSession();
+  }
+
+  // Function to check user session and navigate accordingly
+  Future<void> _checkUserSession() async {
+    final accessToken = await SecureTokenManager()
+        .getAccessToken(); // Get the saved access token
+
+    if (accessToken != null) {
+      // If there's an access token, attempt to fetch user details
+      try {
+        await authController.getUserDetails(); // Fetch user details
+        // After fetching user details, navigate to home if successful
         Get.offAllNamed('/home');
-      } else {
+      } catch (e) {
+        // If fetching user details fails, navigate to login
         Get.offAllNamed('/login');
       }
-    });
+    } else {
+      // If no access token is found, navigate to login screen
+      Get.offAllNamed('/login');
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    // The splash screen is shown while checking the user session
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
@@ -114,7 +139,7 @@ class SplashScreen extends StatelessWidget {
 
                 SizedBox(height: 80),
 
-                // Loading Indicator
+                // Loading Indicator Animation
                 DelayedTweenAnimation(
                   delay: Duration(milliseconds: 1000),
                   duration: Duration(milliseconds: 800),
