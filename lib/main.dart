@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:splitwise/Comman/Colors.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 import 'package:splitwise/View/ChangePasswordScreen.dart';
+import 'package:splitwise/View/GroupScreen.dart';
 import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/View/LoginScreen.dart';
 import 'package:splitwise/View/ProfileEditScreen.dart';
@@ -118,6 +119,11 @@ class MyApp extends StatelessWidget {
             GetPage(
               name: '/updatePassword',
               page: () => ChangePasswordScreen(),
+              transition: Transition.rightToLeft,
+            ),
+            GetPage(
+              name: '/groupScreen',
+              page: () => GroupScreen(),
               transition: Transition.rightToLeft,
             ),
           ],

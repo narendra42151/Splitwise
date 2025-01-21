@@ -112,7 +112,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: homeController.fetchAndSelectContacts,
+              onPressed: () => Get.toNamed("/groupScreen"),
               icon: const Icon(Icons.contacts),
               label: const Text("Select Contacts"),
             ),
