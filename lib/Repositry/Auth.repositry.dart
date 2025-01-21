@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:splitwise/Models/UserModel.dart';
+import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/data/Network/network_api.dart';
 
 class AuthRepository {
@@ -18,6 +21,7 @@ class AuthRepository {
         data,
         '/register',
       );
+
       return UserModel.fromJson(response['data']);
     } catch (e) {
       throw Exception('Registration failed: $e');
@@ -32,11 +36,35 @@ class AuthRepository {
         'password': password
       };
 
+      // Make API call
       final response = await _apiServices.postApi(data, '/login');
+
+      if (response == null) {
+        throw Exception('Response is null');
+      }
+
+      // Directly use the response as it's already a Map
+      final Map<String, dynamic>? jsonResponse =
+          response as Map<String, dynamic>?;
+
+      if (jsonResponse == null || !jsonResponse.containsKey('data')) {
+        throw Exception('Invalid response format');
+      }
+
+      final user = jsonResponse['data']['user'];
+      if (user == null) {
+        throw Exception('User data is null');
+      }
+      final accessToken = jsonResponse['data']['accessToken'];
+      final refreshToken = jsonResponse['data']['refreshToken'];
+
+      // Securely store tokens
+      final tokenManager = SecureTokenManager();
+      await tokenManager.saveTokens(accessToken, refreshToken);
       return {
-        'user': UserModel.fromJson(response['user']),
-        'accessToken': response['accessToken'],
-        'refreshToken': response['refreshToken']
+        'user': UserModel.fromJson(user),
+        'accessToken': accessToken,
+        'refreshToken': refreshToken,
       };
     } catch (e) {
       throw Exception('Login failed: $e');

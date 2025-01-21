@@ -22,7 +22,9 @@ class UserModel {
     username = json['username'];
     profilePicture = json['profilePicture'];
     phoneNumber = json['phoneNumber'];
-    joinedGroups = json['joinedGroups'].cast<String>();
+    joinedGroups = json['joinedGroups'] != null
+        ? List<String>.from(json['joinedGroups'])
+        : null; // Ensure joinedGroups can be null
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
@@ -33,7 +35,7 @@ class UserModel {
     data['username'] = this.username;
     data['profilePicture'] = this.profilePicture;
     data['phoneNumber'] = this.phoneNumber;
-    data['joinedGroups'] = this.joinedGroups;
+    data['joinedGroups'] = this.joinedGroups; // Can be null
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
 

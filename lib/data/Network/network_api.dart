@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
+import 'package:splitwise/Utils/Utils.dart';
 import 'package:splitwise/data/AppException.dart';
 import 'package:splitwise/data/Network/base_api_services.dart';
 
@@ -11,8 +11,9 @@ class NetworkApiServices extends BaseApiServices {
   Future<dynamic> getApi(String url) async {
     dynamic responseJson;
     try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(Uri.parse(BASEURL + url))
+          .timeout(const Duration(seconds: 10));
       responseJson = returnResponse(response);
     } on SocketException {
       print("No Internet connection");
@@ -33,9 +34,8 @@ class NetworkApiServices extends BaseApiServices {
   Future<dynamic> postApi(dynamic data, String url) async {
     dynamic responseJson;
     try {
-      print("hello");
       final response = await http
-          .post(Uri.parse(url),
+          .post(Uri.parse(BASEURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -52,12 +52,8 @@ class NetworkApiServices extends BaseApiServices {
     } on FormatException {
       print("Invalid JSON format");
       throw FetchDataException('Invalid JSON format');
-    } on EmailAlreadyExistsException {
-      throw EmailAlreadyExistsException("Email Already Extist");
     }
     return responseJson;
-
-//json
   }
 
   Future<dynamic> postApiWithHeaders(
@@ -65,23 +61,8 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .post(Uri.parse(url), headers: headers, body: data)
-          .timeout(const Duration(seconds: 10));
-      responseJson = returnResponse(response);
-    } on SocketException {
-      throw InternetException();
-    } on TimeoutException {
-      throw RequestTimeOutException();
-    }
-    return responseJson;
-  }
-
-  Future<dynamic> getApiWithHeaders(
-      String url, Map<String, String>? headers) async {
-    dynamic responseJson;
-    try {
-      final response = await http
-          .get(Uri.parse(url), headers: headers)
+          .post(Uri.parse(BASEURL + url),
+              headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
       responseJson = returnResponse(response);
     } on SocketException {
@@ -96,8 +77,30 @@ class NetworkApiServices extends BaseApiServices {
     } on FormatException {
       print("Invalid JSON format");
       throw FetchDataException('Invalid JSON format');
-    } on EmailAlreadyExistsException {
-      throw EmailAlreadyExistsException("Email Already Extist");
+    }
+    return responseJson;
+  }
+
+  Future<dynamic> getApiWithHeaders(
+      String url, Map<String, String>? headers) async {
+    dynamic responseJson;
+    try {
+      final response = await http
+          .get(Uri.parse(BASEURL + url), headers: headers)
+          .timeout(const Duration(seconds: 10));
+      responseJson = returnResponse(response);
+    } on SocketException {
+      print("No Internet connection");
+      throw InternetException();
+    } on TimeoutException {
+      print("Request timed out");
+      throw RequestTimeOutException();
+    } on HttpException {
+      print("HTTP exception occurred");
+      throw FetchDataException('HTTP exception occurred');
+    } on FormatException {
+      print("Invalid JSON format");
+      throw FetchDataException('Invalid JSON format');
     }
     return responseJson;
   }
@@ -106,7 +109,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .patch(Uri.parse(url),
+          .patch(Uri.parse(BASEURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -127,7 +130,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .put(Uri.parse(url),
+          .put(Uri.parse(BASEURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -149,7 +152,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .patch(Uri.parse(url),
+          .patch(Uri.parse(BASEURL + url),
               headers: headers ?? {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -171,7 +174,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .put(Uri.parse(url),
+          .put(Uri.parse(BASEURL + url),
               headers: headers ?? {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -189,21 +192,25 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   dynamic returnResponse(http.Response response) {
-    switch (response.statusCode) {
-      case 200:
-      case 201:
-        dynamic responseJson = response.body;
-        return responseJson;
-      case 409:
-      case 400:
-      case 401:
-      case 403:
-      case 422:
-        throw InvalidUrlException(response.body);
-      case 500:
-      default:
-        throw FetchDataException(
-            'Error occurred while communicating with server: ${response.statusCode} "  "${response.body}');
+    final responseBody = jsonDecode(response.body);
+    final statusCode = response.statusCode;
+
+    if (statusCode == 200 || statusCode == 201) {
+      // If the response is successful, return the response body.
+      return responseBody;
+    } else if (statusCode == 400 || statusCode == 422) {
+      throw InvalidUrlException(responseBody["message"] ?? "Invalid URL");
+    } else if (statusCode == 401 || statusCode == 403) {
+      throw UnauthorizedException(responseBody["message"] ?? "Unauthorized");
+    } else if (statusCode == 409) {
+      throw EmailAlreadyExistsException(
+          responseBody["message"] ?? "Conflict occurred");
+    } else if (statusCode == 500) {
+      throw FetchDataException(
+          responseBody["message"] ?? "Internal Server Error");
+    } else {
+      throw FetchDataException(
+          'Unexpected error: ${response.statusCode}, ${responseBody["message"] ?? "Unknown error"}');
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:splitwise/Comman/SplashScreen.dart';
 import 'package:splitwise/View/LoginScreen.dart';
 import 'package:splitwise/View/ProfileEditScreen.dart';
 import 'package:splitwise/View/RegisterScreen.dart';
+import 'package:splitwise/View/TestScreen.dart';
 // import 'package:splitwise/View/HomeScreen.dart'; // Replace this with your actual HomeScreen
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
@@ -104,7 +105,7 @@ class MyApp extends StatelessWidget {
             GetPage(
               name: '/home',
               // page: () => HomeScreen(), // Corrected to use HomeScreen
-              page: () => RegisterScreen(),
+              page: () => Testscreen(),
               transition: Transition.fadeIn,
             ),
             GetPage(

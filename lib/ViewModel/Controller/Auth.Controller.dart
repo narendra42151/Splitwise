@@ -19,10 +19,22 @@ class AuthController extends GetxController {
 
       final newUser = await _repository.registerUser(
           username, profilePicture, phoneNumber, password);
+
       user.value = newUser;
-      Get.offAllNamed('/home');
+
+      Get.toNamed('/login');
     } catch (e) {
       error.value = e.toString();
+      print(error.value);
+
+      // Show error in a Snackbar
+      Get.snackbar(
+        "Error", // Title
+        error.value, // Message
+        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
+        backgroundColor: Colors.red, // Background color of the Snackbar
+        colorText: Colors.white, // Text color
+      );
     } finally {
       isLoading.value = false;
     }
@@ -34,10 +46,20 @@ class AuthController extends GetxController {
       error.value = '';
 
       final response = await _repository.loginUser(phoneNumber, password);
+
       user.value = response['user'];
       Get.offAllNamed('/home');
     } catch (e) {
       error.value = e.toString();
+      print(error.value.toString());
+      // Show error in a Snackbar
+      Get.snackbar(
+        "Error", // Title
+        error.value, // Message
+        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
+        backgroundColor: Colors.red, // Background color of the Snackbar
+        colorText: Colors.white, // Text color
+      );
     } finally {
       isLoading.value = false;
     }

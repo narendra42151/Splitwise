@@ -33,3 +33,7 @@ class FetchDataException extends AppException {
 class EmailAlreadyExistsException extends AppException {
   EmailAlreadyExistsException([String? message]) : super(message, '');
 }
+
+class UnauthorizedException extends AppException {
+  UnauthorizedException([String? message]) : super(message, 'Unauthorized');
+}

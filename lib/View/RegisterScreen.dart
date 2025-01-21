@@ -183,7 +183,7 @@ class RegisterScreen extends StatelessWidget {
                                   ? null
                                   : () => controller.register(
                                         usernameController.text,
-                                        selectedImagePath.value,
+                                        "fdsf",
                                         phoneController.text,
                                         passwordController.text,
                                       ),
