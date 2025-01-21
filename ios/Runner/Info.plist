@@ -30,7 +30,7 @@
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<key>NSContactsUsageDescription</key>
-    <string>Reason we need access to the contact list</string>
+    <string>This app requires access to your contacts to create groups.</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

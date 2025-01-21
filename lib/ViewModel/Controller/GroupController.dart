@@ -1,5 +1,4 @@
-import 'package:contacts_service/contacts_service.dart' as cs;
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 
 class GroupController extends GetxController {
@@ -15,22 +14,23 @@ class GroupController extends GetxController {
   Future<void> fetchAllContacts() async {
     try {
       // Request permission to access contacts
-      if (await Permission.contacts.request().isGranted) {
-        // Fetch all contacts from the ContactsService library
-        final Iterable<cs.Contact> contacts =
-            await cs.ContactsService.getContacts();
+      if (await FlutterContacts.requestPermission()) {
+        // Fetch all contacts using flutter_contacts
+        final List<Contact> contacts = await FlutterContacts.getContacts(
+          withProperties: true, // Include phone numbers and emails
+          withPhoto: true, // Include profile pictures
+        );
 
         // Map the contacts into our custom CustomContact model
         allContacts.value = contacts
-            .map((cs.Contact contact) => CustomContact(
-                  displayName: contact.displayName ?? "Unknown",
-                  phoneNumber: contact.phones?.isNotEmpty == true
-                      ? contact.phones!.first.value ?? "No Number"
+            .map((Contact contact) => CustomContact(
+                  displayName: contact.displayName,
+                  phoneNumber: contact.phones.isNotEmpty
+                      ? contact.phones.first.number
                       : "No Number",
-                  profilePicture:
-                      contact.avatar != null && contact.avatar!.isNotEmpty
-                          ? String.fromCharCodes(contact.avatar!)
-                          : null,
+                  profilePicture: contact.photo != null
+                      ? String.fromCharCodes(contact.photo!)
+                      : null,
                 ))
             .toList();
       } else {
@@ -72,12 +72,17 @@ class GroupController extends GetxController {
   void createGroup() {
     if (selectedContacts.isEmpty) {
       Get.snackbar(
-          "Error", "Please select at least one contact to create a group.",
-          snackPosition: SnackPosition.BOTTOM);
+        "Error",
+        "Please select at least one contact to create a group.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } else {
       // Your logic for creating a group can go here
-      Get.snackbar("Success", "Group created successfully!",
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        "Success",
+        "Group created successfully!",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
@@ -87,8 +92,9 @@ class CustomContact {
   final String phoneNumber;
   final String? profilePicture;
 
-  CustomContact(
-      {required this.displayName,
-      required this.phoneNumber,
-      this.profilePicture});
+  CustomContact({
+    required this.displayName,
+    required this.phoneNumber,
+    this.profilePicture,
+  });
 }

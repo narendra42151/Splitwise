@@ -2,7 +2,7 @@ name: splitwise
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -54,9 +53,8 @@ dependencies:
   logger: ^2.5.0
   flutter_secure_storage: ^9.2.4
   fluttertoast: ^8.2.10
-  flutter_contacts: ^1.1.9+2
-  contacts_service: ^0.6.3
   permission_handler: ^11.3.1
+  flutter_contacts: ^1.1.9+2
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +72,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
