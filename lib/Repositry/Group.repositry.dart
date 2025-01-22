@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
+import 'package:splitwise/Models/CustomContact.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
-import 'package:splitwise/ViewModel/Controller/GroupController.dart';
+
 import 'package:splitwise/data/Network/network_api.dart';
 
 class GroupRepository {
@@ -96,6 +97,24 @@ class GroupRepository {
       return response['data'];
     } catch (e) {
       throw Exception('Failed to check contact in database: $e');
+    }
+  }
+
+  Future<List<dynamic>> getUserGroups() async {
+    try {
+      final accessToken = await _tokenManager.getAccessToken();
+
+      final Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      final response =
+          await _apiServices.getApiWithHeaders('/get-group-userId', headers);
+      print(response.toString());
+      return response['data'];
+    } catch (e) {
+      throw Exception('Failed to fetch user groups: $e');
     }
   }
 }

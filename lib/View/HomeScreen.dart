@@ -123,6 +123,13 @@ class HomeScreen extends StatelessWidget {
               child: const Text("Create Group"),
             ),
             const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Get.toNamed("/groupScreenList");
+              },
+              child: const Text("All Groups"),
+            ),
+            const SizedBox(height: 20),
 
             // Groups Section
             Text(

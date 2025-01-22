@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Models/CustomContact.dart';
+import 'package:splitwise/Models/GroupModel.dart';
 import 'package:splitwise/Repositry/Group.repositry.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
@@ -10,6 +12,9 @@ class GroupController extends GetxController {
   RxList<CustomContact> filteredContacts = <CustomContact>[].obs;
   final GroupRepository _repository = GroupRepository();
   final RxBool isLoading = false.obs;
+  RxList<GroupModel> allGroups = <GroupModel>[].obs;
+  RxList<GroupModel> filteredGroups = <GroupModel>[].obs;
+
   final RxString error = ''.obs;
   final AuthController authController = Get.find<AuthController>();
 
@@ -142,6 +147,42 @@ class GroupController extends GetxController {
     selectedContacts.clear();
   }
 
+  Future<void> fetchUserGroups() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _repository.getUserGroups();
+
+      // Parse the response into a list of GroupModel objects
+      final groups = response
+          .map<GroupModel>((json) => GroupModel.fromJson(json))
+          .toList();
+
+      // Update reactive lists
+      allGroups.value = groups;
+      filteredGroups.value = groups; // Initially, display all groups
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to fetch user groups: $e",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void searchGroups(String query) {
+    if (query.isEmpty) {
+      filteredGroups.value = allGroups; // Reset to all groups
+    } else {
+      filteredGroups.value = allGroups
+          .where((group) =>
+              group.name!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+  }
+
   Future<void> createGroup(String groupName) async {
     if (selectedContacts.isEmpty) {
       Get.snackbar(
@@ -171,18 +212,4 @@ class GroupController extends GetxController {
       );
     }
   }
-}
-
-class CustomContact {
-  final String displayName;
-  final String phoneNumber;
-  final String? profilePicture;
-  final String? userId; // Add userId field
-
-  CustomContact({
-    required this.displayName,
-    required this.phoneNumber,
-    this.profilePicture,
-    this.userId,
-  });
 }

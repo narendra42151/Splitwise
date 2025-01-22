@@ -133,6 +133,9 @@ class AuthController extends GetxController {
 
       // Update the user state
       user.value = userDetails;
+      if (user.value == null) {
+        Get.toNamed("/login");
+      }
 
       // You can handle any additional logic here (e.g., navigating to a different screen if needed)
     } catch (e) {
