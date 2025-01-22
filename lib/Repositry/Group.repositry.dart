@@ -125,6 +125,7 @@ class GroupRepository {
       final accessToken = await _tokenManager.getAccessToken();
 
       final Map<String, String> headers = {
+        // 'Authorization': 'Bearer $accessToken',
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       };

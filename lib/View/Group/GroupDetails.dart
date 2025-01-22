@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   final String groupId;
+
   GroupDetailsScreen({required this.groupId, super.key});
+
   @override
   State<StatefulWidget> createState() {
     return _GroupDetailsScreenState();
@@ -13,11 +14,32 @@ class GroupDetailsScreen extends StatefulWidget {
 }
 
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+
+    // Fetch initial group data
     final Groupdetailcontroller controller = Get.put(
       Groupdetailcontroller(groupId: widget.groupId),
     );
+
+    // Add listener to detect when scrolling reaches near the bottom
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          controller.currentPage.value < controller.totalPages.value) {
+        controller.currentPage.value++;
+        controller.fetchGroupData(page: controller.currentPage.value);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Groupdetailcontroller controller = Get.find<Groupdetailcontroller>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Group Details'),
@@ -34,36 +56,54 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         ],
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.expenses.isEmpty) {
+          // Show a loading indicator initially
           return Center(child: CircularProgressIndicator());
         }
 
-        return ListView.builder(
-          itemCount: controller.expenses.length + 1,
-          itemBuilder: (context, index) {
-            if (index == controller.expenses.length) {
-              // Pagination
-              return controller.currentPage.value < controller.totalPages.value
-                  ? ElevatedButton(
-                      onPressed: () {
-                        controller.currentPage.value++;
-                        controller.fetchGroupData(
-                            page: controller.currentPage.value);
-                      },
-                      child: Text('Load More'),
-                    )
-                  : SizedBox.shrink();
-            }
+        if (controller.expenses.isEmpty) {
+          // Show a placeholder message when no expenses are available
+          return Center(
+            child: Text(
+              'No expenses found for this group.',
+              style: TextStyle(fontSize: 16.0, color: Colors.grey),
+            ),
+          );
+        }
 
-            final expense = controller.expenses[index];
-            return ListTile(
-              title: Text(expense.expenseDetails!.description ?? ""),
-              subtitle: Text('Amount: ${expense.expenseDetails!.amount ?? ''}'),
-            );
-          },
+        return Stack(
+          children: [
+            ListView.builder(
+              controller: _scrollController, // Attach the ScrollController
+              itemCount: controller.expenses.length,
+              itemBuilder: (context, index) {
+                final expense = controller.expenses[index];
+                return ListTile(
+                  title: Text(expense.expenseDetails!.description ?? ""),
+                  subtitle: Text(
+                      'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}'),
+                );
+              },
+            ),
+            if (controller.isLoading.value && !controller.expenses.isEmpty)
+              Positioned(
+                bottom: 16.0,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: CircularProgressIndicator(), // Loading indicator
+                ),
+              ),
+          ],
         );
       }),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
 
@@ -108,7 +148,8 @@ class ExpenseSearchDelegate extends SearchDelegate {
           final expense = controller.searchResults[index];
           return ListTile(
             title: Text(expense.expenseDetails!.description ?? ""),
-            subtitle: Text('Amount: ${expense.expenseDetails!.amount ?? ''}'),
+            subtitle:
+                Text('Amount: ${expense.expenseDetails!.amount ?? 'N/A'}'),
           );
         },
       );
