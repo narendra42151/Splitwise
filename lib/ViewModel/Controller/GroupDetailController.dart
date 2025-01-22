@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 
 import 'package:splitwise/Models/ExpenseModel.dart';
@@ -15,6 +13,8 @@ class Groupdetailcontroller extends GetxController {
   var totalPages = 1.obs;
   var currentPage = 1.obs;
   var query = "".obs;
+  final selectedMembers = <bool>[].obs;
+  final splitAmounts = <double>[].obs;
 
   final String groupId;
   final int limit;
@@ -25,6 +25,7 @@ class Groupdetailcontroller extends GetxController {
   void onInit() {
     super.onInit();
     fetchGroupData();
+    ever(groupDetails, (_) => initializeSplitSelection());
   }
 
   Future<void> fetchGroupData({int page = 1}) async {
@@ -85,6 +86,92 @@ class Groupdetailcontroller extends GetxController {
                 .contains(query.toLowerCase()))
             .toList(),
       );
+    }
+  }
+
+  void initializeSplitSelection() {
+    final membersCount = groupDetails.value?.members?.length ?? 0;
+
+    // Initialize all members as selected
+    selectedMembers.assignAll(List.generate(membersCount, (index) => true));
+
+    // Initialize split amounts with equal distribution
+    splitAmounts.assignAll(List.generate(membersCount, (index) => 0.0));
+  }
+
+  void toggleMemberSelection(int index) {
+    if (index < selectedMembers.length) {
+      selectedMembers[index] = !selectedMembers[index];
+    }
+  }
+
+  void calculateSplitAmount(String totalAmountStr) {
+    final totalAmount = double.tryParse(totalAmountStr) ?? 0.0;
+
+    // Calculate the number of selected members
+    final selectedCount =
+        selectedMembers.where((isSelected) => isSelected).length;
+
+    // If no members are selected, reset split amounts
+    if (selectedCount == 0) {
+      splitAmounts
+          .assignAll(List.generate(selectedMembers.length, (index) => 0.0));
+      return;
+    }
+
+    // Calculate split amount
+    final splitAmount = totalAmount / selectedCount;
+
+    // Update split amounts based on selection
+    splitAmounts.assignAll(List.generate(selectedMembers.length, (index) {
+      return selectedMembers[index] ? splitAmount : 0.0;
+    }));
+  }
+
+  List<String> getSelectedMembersUserIds() {
+    final members = groupDetails.value?.members ?? [];
+    final userIds = <String>[];
+
+    for (int i = 0; i < members.length; i++) {
+      if (selectedMembers[i]) {
+        userIds.add(members[i].groupId ?? ""); // Add user ID to the list
+      }
+    }
+
+    return userIds;
+  }
+
+  Future<void> createExpense({
+    required String groupId,
+    required String description,
+    required double amount,
+    required String paidBy,
+    required List<String> splitAmong,
+    required String splitType,
+    required Map<String, double> manualSplit,
+  }) async {
+    try {
+      isLoading(true);
+      // print(splitAmong.toString());
+      final response = await _repository.createExpense(
+        groupId: groupId,
+        description: description,
+        amount: amount,
+        paidBy: paidBy,
+        splitAmong: splitAmong,
+        splitType: splitType,
+        manualSplit: manualSplit,
+      );
+
+      if (response != null) {
+        Get.snackbar("Success", "Expense created successfully!",
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to create expense: ${e.toString()}",
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading(false);
     }
   }
 }

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/View/Group/AmountScreen.dart';
+import 'package:splitwise/View/Group/SplitExpenseScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   final String groupId;
-
   GroupDetailsScreen({required this.groupId, super.key});
 
   @override
-  State<StatefulWidget> createState() {
-    return _GroupDetailsScreenState();
-  }
+  State<StatefulWidget> createState() => _GroupDetailsScreenState();
 }
 
 class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
@@ -19,13 +18,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Fetch initial group data
-    final Groupdetailcontroller controller = Get.put(
-      Groupdetailcontroller(groupId: widget.groupId),
-    );
-
-    // Add listener to detect when scrolling reaches near the bottom
+    final controller = Get.put(Groupdetailcontroller(groupId: widget.groupId));
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -38,35 +31,60 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Groupdetailcontroller controller = Get.find<Groupdetailcontroller>();
+    final controller = Get.find<Groupdetailcontroller>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Group Details'),
+        elevation: 0,
+        title: Text(
+          'Group Details',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: ExpenseSearchDelegate(controller),
-              );
-            },
+            onPressed: () => showSearch(
+              context: context,
+              delegate: ExpenseSearchDelegate(controller),
+            ),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Implement split expense logic
+          Get.to(() => AmountInputScreen());
+        },
+        icon: Icon(Icons.group_add),
+        label: Text('Split Expense'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
       body: Obx(() {
         if (controller.isLoading.value && controller.expenses.isEmpty) {
-          // Show a loading indicator initially
           return Center(child: CircularProgressIndicator());
         }
 
         if (controller.expenses.isEmpty) {
-          // Show a placeholder message when no expenses are available
           return Center(
-            child: Text(
-              'No expenses found for this group.',
-              style: TextStyle(fontSize: 16.0, color: Colors.grey),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.receipt_long,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'No expenses yet',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -74,14 +92,45 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         return Stack(
           children: [
             ListView.builder(
-              controller: _scrollController, // Attach the ScrollController
+              controller: _scrollController,
+              padding: EdgeInsets.only(bottom: 80),
               itemCount: controller.expenses.length,
               itemBuilder: (context, index) {
                 final expense = controller.expenses[index];
-                return ListTile(
-                  title: Text(expense.expenseDetails!.description ?? ""),
-                  subtitle: Text(
-                      'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}'),
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  elevation: 2,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(16),
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: Icon(
+                        Icons.receipt,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    title: Text(
+                      expense.expenseDetails!.description ?? "",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 8),
+                        Text(
+                          'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    trailing: Icon(Icons.chevron_right),
+                  ),
                 );
               },
             ),
@@ -90,9 +139,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 bottom: 16.0,
                 left: 0,
                 right: 0,
-                child: Center(
-                  child: CircularProgressIndicator(), // Loading indicator
-                ),
+                child: Center(child: CircularProgressIndicator()),
               ),
           ],
         );
@@ -109,7 +156,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
 class ExpenseSearchDelegate extends SearchDelegate {
   final Groupdetailcontroller controller;
-
   ExpenseSearchDelegate(this.controller);
 
   @override
@@ -129,35 +175,74 @@ class ExpenseSearchDelegate extends SearchDelegate {
   Widget? buildLeading(BuildContext context) {
     return IconButton(
       icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
+      onPressed: () => close(context, null),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
     controller.searchExpenses(query);
+    return buildSearchResults(context);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) => buildResults(context);
+
+  Widget buildSearchResults(BuildContext context) {
     return Obx(() {
       if (controller.searchResults.isEmpty) {
-        return Center(child: Text('No results found'));
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No results found',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
       }
+
       return ListView.builder(
         itemCount: controller.searchResults.length,
         itemBuilder: (context, index) {
           final expense = controller.searchResults[index];
-          return ListTile(
-            title: Text(expense.expenseDetails!.description ?? ""),
-            subtitle:
-                Text('Amount: ${expense.expenseDetails!.amount ?? 'N/A'}'),
+          return Card(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(16),
+              leading: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: Icon(
+                  Icons.receipt,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+              title: Text(
+                expense.expenseDetails!.description ?? "",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           );
         },
       );
     });
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return buildResults(context);
   }
 }

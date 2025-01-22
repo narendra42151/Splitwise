@@ -149,4 +149,57 @@ class GroupRepository {
       throw Exception('Failed to fetch user groups: $e');
     }
   }
+
+  Future<Map<String, dynamic>> createExpense({
+    required String groupId,
+    required String description,
+    required double amount,
+    required String paidBy,
+    required List<String> splitAmong,
+    required String splitType,
+    required Map<String, double> manualSplit,
+  }) async {
+    try {
+      // Get the access token
+      final accessToken = await _tokenManager.getAccessToken();
+
+      // Define headers
+      final Map<String, String> headers = {
+        'authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      // Prepare the request body
+      final Map<String, dynamic> requestBody = {
+        "groupId": groupId,
+        "description": description,
+        "amount": amount,
+        "paidBy": [paidBy], // Single user ID in a list
+        "splitAmong": splitAmong,
+        "splitType": splitType,
+        // "manualSplit": manualSplit.isEmpty ? {} : manualSplit,
+      };
+
+      // Make the API call
+      final response = await _apiServices.postApiWithHeaders(
+        requestBody,
+        '/create-expense', // Ensure the endpoint spelling is correct
+        headers,
+      );
+
+      // Debug Response
+      print("API Response: $response");
+
+      // Parse response
+      if (response is String) {
+        return jsonDecode(response) as Map<String, dynamic>;
+      } else if (response is Map<String, dynamic>) {
+        return response;
+      } else {
+        throw Exception('Unexpected response format: $response');
+      }
+    } catch (e) {
+      throw Exception('Failed to create expense: $e');
+    }
+  }
 }
