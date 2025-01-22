@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 
 import 'package:splitwise/Models/ExpenseModel.dart';
@@ -28,12 +30,29 @@ class Groupdetailcontroller extends GetxController {
   Future<void> fetchGroupData({int page = 1}) async {
     isLoading(true);
     try {
-      final response = await _repository.fetchFromApi(
-          groupId, page); // Replace with your API call logic
+      // Fetch parsed response from the repository
+      final response = await _repository.fetchFromApi(groupId, page);
+
+      print("From Controller");
+      print(response.toString());
+
+      // Validate response structure
+      if (!response.containsKey('data')) {
+        throw Exception('Invalid response format: Missing "data" key');
+      }
+
       if (response['success'] == true) {
         final data = response['data'];
+        print(data['group']);
+
+        // Update group details
+
         groupDetails.value = GroupModel.fromJson(data['group']);
+
+        // Update pagination details
         totalPages.value = data['totalPages'];
+
+        // Handle expenses based on pagination
         if (page == 1) {
           expenses.assignAll(data['expenses']
               .map<ExpenseModel>((json) => ExpenseModel.fromJson(json))
@@ -43,8 +62,11 @@ class Groupdetailcontroller extends GetxController {
               .map<ExpenseModel>((json) => ExpenseModel.fromJson(json))
               .toList());
         }
+      } else {
+        throw Exception(response['message'] ?? 'Unknown error occurred');
       }
     } catch (e) {
+      print(e.toString());
       Get.snackbar("Error", e.toString());
     } finally {
       isLoading(false);

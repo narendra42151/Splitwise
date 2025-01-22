@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:splitwise/Models/CustomContact.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
@@ -127,10 +129,21 @@ class GroupRepository {
         'Content-Type': 'application/json',
       };
 
+      // Make the API call
       final response = await _apiServices.getApiWithHeaders(
-          '/get-group/:${groupId}?limit=5&page=${page}', headers);
-      print(response.toString());
-      return response;
+          '/get-group/${groupId}?limit=5&page=${page}', headers);
+
+      // Parse the response body if it's a string
+      if (response is String) {
+        return jsonDecode(response) as Map<String, dynamic>;
+      }
+
+      // If already a Map, return it
+      if (response is Map<String, dynamic>) {
+        return response;
+      }
+
+      throw Exception('Unexpected response format');
     } catch (e) {
       throw Exception('Failed to fetch user groups: $e');
     }
