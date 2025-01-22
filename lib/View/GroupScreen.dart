@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class GroupScreen extends StatelessWidget {
@@ -36,9 +34,7 @@ class GroupScreen extends StatelessWidget {
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              onChanged: (value) {
-                // Implement search filter logic if required
-              },
+              onChanged: groupController.filterContacts,
             ),
           ),
           // Selected Contacts
@@ -60,9 +56,9 @@ class GroupScreen extends StatelessWidget {
           Expanded(
             child: Obx(() {
               return ListView.builder(
-                itemCount: groupController.allContacts.length,
+                itemCount: groupController.filteredContacts.length,
                 itemBuilder: (context, index) {
-                  final contact = groupController.allContacts[index];
+                  final contact = groupController.filteredContacts[index];
                   final isSelected =
                       groupController.selectedContacts.contains(contact);
 
@@ -96,7 +92,11 @@ class GroupScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: groupController.createGroup,
+              onPressed: () async {
+                groupController.createGroup(
+                  "Hello",
+                );
+              },
               child: const Text("Create Group"),
             ),
           ),

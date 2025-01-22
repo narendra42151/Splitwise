@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Repositry/Group.repositry.dart';
+import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
 class GroupController extends GetxController {
   RxList<CustomContact> allContacts = <CustomContact>[].obs;
   RxList<CustomContact> selectedContacts = <CustomContact>[].obs;
+  RxList<CustomContact> filteredContacts = <CustomContact>[].obs;
   final GroupRepository _repository = GroupRepository();
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
+  final AuthController authController = Get.find<AuthController>();
+
   @override
   void onInit() {
     super.onInit();
@@ -37,6 +41,9 @@ class GroupController extends GetxController {
                       : null,
                 ))
             .toList();
+
+        // Initially, filteredContacts will contain all contacts
+        filteredContacts.value = allContacts;
       } else {
         // Show a message if permission is denied
         Get.snackbar(
@@ -54,6 +61,20 @@ class GroupController extends GetxController {
     }
   }
 
+  void filterContacts(String query) {
+    if (query.isEmpty) {
+      // If search query is empty, show all contacts
+      filteredContacts.value = allContacts;
+    } else {
+      // Filter contacts based on display name or phone number
+      filteredContacts.value = allContacts
+          .where((contact) =>
+              contact.displayName.toLowerCase().contains(query.toLowerCase()) ||
+              contact.phoneNumber.contains(query))
+          .toList();
+    }
+  }
+
   Future<void> validateContact(CustomContact contact) async {
     try {
       isLoading.value = true;
@@ -61,14 +82,29 @@ class GroupController extends GetxController {
 
       // Remove all non-numeric characters from the phone number
       var phoneNumber = contact.phoneNumber.replaceAll(RegExp(r'\D'), '');
-      print(phoneNumber);
+
+      if (phoneNumber.startsWith('91')) {
+        phoneNumber =
+            phoneNumber.substring(2); // Remove the first two characters
+      }
 
       // Check if the contact is in the database
-      final isInDatabase =
-          await _repository.checkContactInDatabase(phoneNumber);
+      final response = await _repository.checkContactInDatabase(phoneNumber);
+      print(response);
 
-      if (isInDatabase) {
-        selectedContacts.add(contact);
+      final exists = response['exists'];
+      final userId = response['userId'];
+
+      if (exists) {
+        // Create a new contact with the userId
+        final updatedContact = CustomContact(
+          displayName: contact.displayName,
+          phoneNumber: contact.phoneNumber,
+          profilePicture: contact.profilePicture,
+          userId: userId, // Include the userId
+        );
+
+        selectedContacts.add(updatedContact);
 
         // Show success message
         Get.snackbar(
@@ -102,18 +138,35 @@ class GroupController extends GetxController {
     }
   }
 
-  void createGroup() {
+  void clearContacts() {
+    selectedContacts.clear();
+  }
+
+  Future<void> createGroup(String groupName) async {
     if (selectedContacts.isEmpty) {
       Get.snackbar(
         "Error",
         "Please select at least one contact to create a group.",
         snackPosition: SnackPosition.BOTTOM,
       );
-    } else {
-      // Your logic for creating a group can go here
+      return;
+    }
+
+    try {
+      final response = await _repository.createGroup(
+          groupName, selectedContacts, authController.user.value!.userId ?? "");
+      if (response != null) {
+        Get.snackbar(
+          "Success",
+          "Group created successfully!",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        clearContacts();
+      }
+    } catch (e) {
       Get.snackbar(
-        "Success",
-        "Group created successfully!",
+        "Error",
+        "Failed to create group: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
       );
     }
@@ -124,10 +177,12 @@ class CustomContact {
   final String displayName;
   final String phoneNumber;
   final String? profilePicture;
+  final String? userId; // Add userId field
 
   CustomContact({
     required this.displayName,
     required this.phoneNumber,
     this.profilePicture,
+    this.userId,
   });
 }

@@ -1,4 +1,6 @@
+import 'package:get/get.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
+import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 import 'package:splitwise/data/Network/network_api.dart';
 
 class GroupRepository {
@@ -6,21 +8,32 @@ class GroupRepository {
   final _tokenManager = SecureTokenManager();
 
   // Create a group
-  Future<dynamic> createGroup(String name, List<String> members) async {
+  Future<dynamic> createGroup(
+      String name, RxList<CustomContact> members, String ownerId) async {
     try {
       final accessToken = await _tokenManager.getAccessToken();
+      final List<String> userIds = members
+          .map((contact) =>
+              contact.userId ?? '') // Use empty string if userId is null
+          .where((id) => id.isNotEmpty) // Remove empty strings if any
+          .toList();
+      if (ownerId.isNotEmpty) {
+        userIds.add(ownerId);
+      }
+
       final Map<String, dynamic> data = {
         'name': name,
-        'members': members,
+        'members': userIds, // List of userIds as strings
       };
 
       final Map<String, String> headers = {
-        'Authorization': 'Bearer $accessToken',
+        'authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       };
 
       final response =
-          await _apiServices.postApiWithHeaders(data, '/groups', headers);
+          await _apiServices.postApiWithHeaders(data, '/create-group', headers);
+
       return response['data'];
     } catch (e) {
       throw Exception('Failed to create group: $e');
@@ -68,7 +81,8 @@ class GroupRepository {
     }
   }
 
-  Future<bool> checkContactInDatabase(String phoneNumber) async {
+  Future<Map<String, dynamic>> checkContactInDatabase(
+      String phoneNumber) async {
     try {
       final Map<String, dynamic> data = {'phoneNumber': phoneNumber};
 
@@ -79,12 +93,7 @@ class GroupRepository {
         throw Exception('Invalid response from server');
       }
 
-      final exists = response['data']['exists'];
-      if (exists == null || exists is! bool) {
-        throw Exception('Response does not contain a valid "exists" field');
-      }
-
-      return exists;
+      return response['data'];
     } catch (e) {
       throw Exception('Failed to check contact in database: $e');
     }
