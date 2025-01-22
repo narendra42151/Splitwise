@@ -60,17 +60,10 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
 
         final group = controller.groupDetails.value;
         if (group?.members == null) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset(
-                  'assets/loding.json',
-                  width: 200,
-                  height: 200,
-                ),
-                Text("No members available"),
-              ],
+              children: [CircularProgressIndicator()],
             ),
           );
         }

@@ -183,7 +183,7 @@ class GroupRepository {
       // Make the API call
       final response = await _apiServices.postApiWithHeaders(
         requestBody,
-        '/create-expense', // Ensure the endpoint spelling is correct
+        '/create-expence', // Ensure the endpoint spelling is correct
         headers,
       );
 
