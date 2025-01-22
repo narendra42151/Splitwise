@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/View/Group/GroupDetails.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class GroupListScreen extends StatelessWidget {
@@ -51,22 +52,19 @@ class GroupListScreen extends StatelessWidget {
                   final group = groupController.filteredGroups[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: group.members!.isNotEmpty &&
-                              group.members!.first.profilePicture != null
-                          ? NetworkImage(group.members!.first.profilePicture!)
-                          : null,
+                      // backgroundImage: group.members!.isNotEmpty &&
+                      //         group.members!.first.profilePicture != null
+                      //     ? NetworkImage(group.members!.first.profilePicture!)
+                      //     : null,
                       child: const Icon(Icons.group),
                     ),
                     title: Text(group.name ?? "Unnamed Group"),
                     subtitle:
                         Text("Created by: ${group.createdBy ?? 'Unknown'}"),
                     onTap: () {
-                      // Navigate to group details or perform an action
-                      Get.snackbar(
-                        "Group Selected",
-                        "You selected ${group.name ?? 'this group'}",
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
+                      Get.to(() => GroupDetailsScreen(
+                            groupId: group.groupId ?? "",
+                          ));
                     },
                   );
                 },

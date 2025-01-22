@@ -1,9 +1,9 @@
 class GroupModel {
   String? groupId;
   String? name;
-  String? createdBy;
+  CreatedBy? createdBy; // Update type from String? to CreatedBy?
   List<Members>? members;
-  List<Null>? expenses;
+  List<dynamic>? expenses; // Use dynamic for flexibility
   String? createdAt;
   String? updatedAt;
 
@@ -20,34 +20,52 @@ class GroupModel {
   GroupModel.fromJson(Map<String, dynamic> json) {
     groupId = json['_id'];
     name = json['name'];
-    createdBy = json['createdBy'];
+    createdBy = json['createdBy'] != null
+        ? CreatedBy.fromJson(json['createdBy']) // Parse createdBy as an object
+        : null;
     if (json['members'] != null) {
       members = <Members>[];
       json['members'].forEach((v) {
-        members!.add(new Members.fromJson(v));
+        members!.add(Members.fromJson(v));
       });
     }
-    expenses = [];
-
+    expenses = json['expenses'] ?? [];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.groupId;
-    data['name'] = this.name;
-    data['createdBy'] = this.createdBy;
-    if (this.members != null) {
-      data['members'] = this.members!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = groupId;
+    data['name'] = name;
+    if (createdBy != null) {
+      data['createdBy'] = createdBy!.toJson();
     }
-    if (this.expenses != null) {
-      data['expenses'] = this.expenses;
+    if (members != null) {
+      data['members'] = members!.map((v) => v.toJson()).toList();
     }
+    data['expenses'] = expenses;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    return data;
+  }
+}
 
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
+class CreatedBy {
+  String? id;
+  String? username;
 
+  CreatedBy({this.id, this.username});
+
+  CreatedBy.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    username = json['username'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = id;
+    data['username'] = username;
     return data;
   }
 }

@@ -118,10 +118,7 @@ class HomeScreen extends StatelessWidget {
               label: const Text("Select Contacts"),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: homeController.addGroup,
-              child: const Text("Create Group"),
-            ),
+
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {

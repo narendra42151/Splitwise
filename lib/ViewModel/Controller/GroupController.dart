@@ -162,6 +162,7 @@ class GroupController extends GetxController {
       allGroups.value = groups;
       filteredGroups.value = groups; // Initially, display all groups
     } catch (e) {
+      print(e.toString());
       Get.snackbar(
         "Error",
         "Failed to fetch user groups: $e",

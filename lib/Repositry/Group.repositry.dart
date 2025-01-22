@@ -52,7 +52,7 @@ class GroupRepository {
       };
 
       final response =
-          await _apiServices.getApiWithHeaders('/groups/$groupId', headers);
+          await _apiServices.getApiWithHeaders('/get-group/$groupId', headers);
       return response['data'];
     } catch (e) {
       throw Exception('Failed to fetch group details: $e');
@@ -111,8 +111,26 @@ class GroupRepository {
 
       final response =
           await _apiServices.getApiWithHeaders('/get-group-userId', headers);
-      print(response.toString());
+
       return response['data'];
+    } catch (e) {
+      throw Exception('Failed to fetch user groups: $e');
+    }
+  }
+
+  Future<dynamic> fetchFromApi(String groupId, int page) async {
+    try {
+      final accessToken = await _tokenManager.getAccessToken();
+
+      final Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await _apiServices.getApiWithHeaders(
+          '/get-group/:${groupId}?limit=5&page=${page}', headers);
+      print(response.toString());
+      return response;
     } catch (e) {
       throw Exception('Failed to fetch user groups: $e');
     }
