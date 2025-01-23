@@ -105,7 +105,9 @@ class _TestScreenState extends State<TestScreen> {
             // Add Member Button
             ElevatedButton.icon(
               onPressed: () {
-                Get.to(() => GroupScreen(isUpdate: true));
+                Get.to(() => GroupScreen(
+                      isUpdate: true,
+                    ));
               },
               icon: const Icon(Icons.add),
               label: const Text('Add Member'),

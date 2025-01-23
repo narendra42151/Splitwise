@@ -5,7 +5,6 @@ import 'package:splitwise/Comman/Colors.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 import 'package:splitwise/View/User/ChangePasswordScreen.dart';
 import 'package:splitwise/View/Group/GroupListScreen.dart';
-
 import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/View/User/LoginScreen.dart';
 import 'package:splitwise/View/User/ProfileEditScreen.dart';

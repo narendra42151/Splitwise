@@ -24,7 +24,9 @@ class GroupListScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                Get.to(() => GroupScreen(isUpdate: false));
+                Get.to(() => GroupScreen(
+                      isUpdate: false,
+                    ));
               },
               icon: Icon(Icons.add))
         ],

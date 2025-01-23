@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:splitwise/Comman/TestScreen.dart';
+
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
-class GroupScreen extends StatelessWidget {
+class GroupScreen extends StatefulWidget {
   final bool isUpdate;
 
   GroupScreen({required this.isUpdate});
+
+  @override
+  State<GroupScreen> createState() => _GroupScreenState();
+}
+
+class _GroupScreenState extends State<GroupScreen> {
+  final TextEditingController groupName = TextEditingController();
+
+  @override
+  void dispose() {
+    groupName.dispose();
+
+    super.dispose();
+  }
+
   final GroupController groupController = Get.put(GroupController());
 
   @override
@@ -31,14 +46,27 @@ class GroupScreen extends StatelessWidget {
           // Search Bar
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: "Search name or number",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              onChanged: groupController.filterContacts,
+            child: Column(
+              children: [
+                widget.isUpdate
+                    ? SizedBox()
+                    : TextField(
+                        controller: groupName,
+                        decoration: InputDecoration(hintText: "Group Name"),
+                      ),
+                SizedBox(
+                  height: 5,
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    hintText: "Search name or number",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onChanged: groupController.filterContacts,
+                ),
+              ],
             ),
           ),
           // Selected Contacts
@@ -97,13 +125,15 @@ class GroupScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
                 onPressed: () async {
-                  isUpdate
+                  widget.isUpdate
                       ? Navigator.of(context).pop()
                       : groupController.createGroup(
-                          "Hello",
+                          groupName.text,
                         );
                 },
-                child: isUpdate ? Text("Add Member") : Text("Create Group")),
+                child: widget.isUpdate
+                    ? Text("Add Member")
+                    : Text("Create Group")),
           ),
         ],
       ),
