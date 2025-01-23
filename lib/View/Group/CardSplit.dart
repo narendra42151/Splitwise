@@ -4,8 +4,10 @@ import 'package:splitwise/Models/ExpenseModel.dart';
 
 class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
+  final VoidCallback onTap;
 
-  const SplitRequestCard({Key? key, required this.expenseModel})
+  const SplitRequestCard(
+      {required this.onTap, Key? key, required this.expenseModel})
       : super(key: key);
 
   @override
@@ -92,7 +94,7 @@ class SplitRequestCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "${expenseDetails.paidBy!.length}/4 Paid",
+                          "${expenseDetails.paidBy!.length}/${expenseDetails.splitAmong!.length} Paid",
                           style: TextStyle(
                             color: isDark ? Colors.white70 : Colors.black54,
                             fontSize: 12,
@@ -186,11 +188,16 @@ class SplitRequestCard extends StatelessWidget {
                 )),
           ],
         ),
-        Icon(
-          Icons.arrow_forward_ios,
-          color: isDark ? Colors.white54 : Colors.black54,
-          size: 16,
-        ),
+        IconButton(
+          onPressed: () {
+            onTap;
+          },
+          icon: Icon(
+            Icons.arrow_forward_ios,
+            color: isDark ? Colors.white54 : Colors.black54,
+            size: 16,
+          ),
+        )
       ],
     );
   }

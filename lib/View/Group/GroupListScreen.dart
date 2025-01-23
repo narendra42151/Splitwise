@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Comman/TestScreen.dart';
 import 'package:splitwise/View/Group/GroupDetails.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
@@ -14,6 +15,11 @@ class GroupListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Groups"),
+        leading: IconButton(
+            onPressed: () {
+              Get.toNamed("/home");
+            },
+            icon: Icon(Icons.arrow_back)),
         actions: [
           IconButton(
               onPressed: () {
@@ -68,8 +74,11 @@ class GroupListScreen extends StatelessWidget {
                     title: Text(group.name ?? "Unnamed Group"),
                     subtitle: Text(
                         "Created by: ${group.createdBy!.username ?? 'Unknown'}"),
-                    trailing:
-                        IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+                    trailing: IconButton(
+                        onPressed: () {
+                          Get.to(() => TestScreen(group: group));
+                        },
+                        icon: Icon(Icons.edit)),
                     onTap: () {
                       Get.to(() => GroupDetailsScreen(
                             groupId: group.groupId ?? "",

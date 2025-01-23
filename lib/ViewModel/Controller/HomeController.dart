@@ -1,6 +1,6 @@
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
-import 'package:splitwise/ViewModel/SelectContactScreen.dart';
+import 'package:splitwise/View/User/SelectContactScreen.dart';
 
 class HomeScreenController extends GetxController {
   var selectedContacts = <Contact>[].obs;

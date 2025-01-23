@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
 import 'package:splitwise/View/Group/CardSplit.dart';
+import 'package:splitwise/View/Group/PaymentDetailScreen.dart';
 
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
@@ -109,6 +110,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               itemBuilder: (context, index) {
                 final expense = controller.expenses[index];
                 return SplitRequestCard(
+                  onTap: () => PaymentRequestScreen(),
                   expenseModel: expense,
                 );
               },
