@@ -1,120 +1,222 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:splitwise/Comman/Colors.dart';
+import 'package:splitwise/Models/ExpenseModel.dart';
 
 class PaymentRequestScreen extends StatelessWidget {
-  final List<Map<String, String>> participants = [
-    {'name': 'You', 'amount': '₹28.75'},
-    {'name': 'Narendra Deshmukh', 'amount': '₹28.75'},
-    {'name': 'Rohit Lokhande', 'amount': '₹28.75'},
-    {'name': 'Ayush Yadav', 'amount': 'Sent this request'},
-  ];
+  final ExpenseModel expenseModel;
+  final ThemeController themeController = Get.find();
+
+  PaymentRequestScreen({super.key, required this.expenseModel});
 
   @override
   Widget build(BuildContext context) {
+    final creator = expenseModel.expenseDetails?.paidBy?.first;
+    final splitAmong = expenseModel.expenseDetails?.splitAmong ?? [];
+    final totalAmount = expenseModel.expenseDetails?.amount ?? 0.0;
+
+    // Calculate split amount considering potential division by zero
+    final splitAmount = totalAmount / (splitAmong.length);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {},
+        elevation: 0,
+        title: Text(
+          'Payment Request',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
-        title: Text('Payment Request', style: TextStyle(color: Colors.white)),
       ),
       body: Container(
-        color: Colors.black,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? [
+                    Colors.blueGrey.shade900,
+                    Colors.black,
+                  ]
+                : [
+                    Colors.blue.shade100,
+                    Colors.white,
+                  ],
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
+            // Header Section (unchanged)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage:
-                        AssetImage('assets/profile_placeholder.png'),
+                  Hero(
+                    tag: 'profile_${creator?.username}',
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage('assets/me.png'),
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                    ),
                   ),
                   SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ayush requested ₹28.75',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: Colors.green, size: 16),
-                          SizedBox(width: 4),
-                          Text('You paid',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14)),
-                        ],
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${creator?.username ?? "Unknown"} requested',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '₹${totalAmount.toStringAsFixed(2)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.check_circle,
+                                color: Colors.green, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'You paid',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            Divider(color: Colors.grey, thickness: 0.5),
-            // List Section
+            Divider(
+                color: Theme.of(context).dividerColor.withOpacity(0.3),
+                thickness: 0.5),
+            // List Section (modified)
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
               child: Text(
-                '4 of 4 paid',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+                '${splitAmong.length + 1} of ${splitAmong.length + 1} to pay',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
               ),
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: participants.length,
+                itemCount: splitAmong.length,
                 itemBuilder: (context, index) {
-                  final participant = participants[index];
+                  final participant = splitAmong[index];
+
+                  // Check if participant is in paidBy list
+                  final isPaid = expenseModel.expenseDetails?.paidBy?.any(
+                        (paidMember) =>
+                            paidMember.groupId == participant.groupId,
+                      ) ??
+                      false;
+
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.purple,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
                       child: Text(
-                        participant['name']![0],
-                        style: TextStyle(color: Colors.white),
+                        participant.username?.substring(0, 1) ?? '?',
+                        style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
                     title: Text(
-                      participant['name']!,
-                      style: TextStyle(color: Colors.white),
+                      participant.username ?? 'Unknown',
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    trailing: Text(
-                      participant['amount']!,
-                      style: TextStyle(
-                          color: participant['amount'] == 'Sent this request'
-                              ? Colors.grey
-                              : Colors.white),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '₹${splitAmount.toStringAsFixed(2)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                        SizedBox(width: 8),
+                        if (isPaid)
+                          Icon(Icons.check_circle,
+                              color: Colors.green, size: 20),
+                      ],
                     ),
                   );
                 },
               ),
             ),
-            Divider(color: Colors.grey, thickness: 0.5),
-            Padding(
+            Divider(
+                color: Theme.of(context).dividerColor.withOpacity(0.3),
+                thickness: 0.5),
+            // Total Section
+            Container(
               padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor.withOpacity(0.5),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Total:',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   Text(
-                    '₹115',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    '₹${totalAmount.toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Handle payment confirmation
+          Get.snackbar(
+            'Paid',
+            'Payment request confirmed',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        },
+        label: Text('Confirm Payment'),
+        icon: Icon(Icons.check),
       ),
     );
   }

@@ -6,9 +6,11 @@ class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
   final VoidCallback onTap;
 
-  const SplitRequestCard(
-      {required this.onTap, Key? key, required this.expenseModel})
-      : super(key: key);
+  const SplitRequestCard({
+    required this.expenseModel,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +192,7 @@ class SplitRequestCard extends StatelessWidget {
         ),
         IconButton(
           onPressed: () {
-            onTap;
+            onTap();
           },
           icon: Icon(
             Icons.arrow_forward_ios,

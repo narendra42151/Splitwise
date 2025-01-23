@@ -213,4 +213,34 @@ class GroupController extends GetxController {
       );
     }
   }
+
+  Future<void> updateGroup(String groupName, String groupId) async {
+    if (selectedContacts.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please select at least one contact to create a group.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      final response = await _repository.updateGroupDetails(
+          groupId, groupName, selectedContacts);
+      if (response != null) {
+        Get.snackbar(
+          "Success",
+          "Group Updated successfully!",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        clearContacts();
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to create group: ${e.toString()}",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 }

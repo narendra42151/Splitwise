@@ -3,6 +3,11 @@ import 'package:get/get.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class GroupScreen extends StatelessWidget {
+  final bool isUpdate;
+  final String groupId;
+  final String name;
+  GroupScreen(
+      {required this.groupId, required this.name, required this.isUpdate});
   final GroupController groupController = Get.put(GroupController());
 
   @override
@@ -93,9 +98,11 @@ class GroupScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () async {
-                groupController.createGroup(
-                  "Hello",
-                );
+                isUpdate
+                    ? groupController.updateGroup(name, groupId)
+                    : groupController.createGroup(
+                        "Hello",
+                      );
               },
               child: const Text("Create Group"),
             ),

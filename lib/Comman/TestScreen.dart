@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/CustomContact.dart';
 import 'package:splitwise/Models/GroupModel.dart';
+import 'package:splitwise/View/Group/GroupScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class TestScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _TestScreenState extends State<TestScreen> {
       final existingContact = controller.allContacts.firstWhereOrNull(
         (contact) {
           var contactPhoneNumber =
-              contact.phoneNumber.replaceAll(RegExp(r'\D'), '') ?? '';
+              contact.phoneNumber.replaceAll(RegExp(r'\D'), '');
           if (contactPhoneNumber.startsWith('91')) {
             contactPhoneNumber = contactPhoneNumber
                 .substring(2); // Remove the first two characters
@@ -83,10 +84,15 @@ class _TestScreenState extends State<TestScreen> {
                       final contact = controller.selectedContacts[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: contact.profilePicture != null &&
-                                  contact.profilePicture!.isNotEmpty
-                              ? NetworkImage(contact.profilePicture!)
-                              : null,
+                          backgroundImage:
+                              //  contact.profilePicture != null &&
+                              //         contact.profilePicture!.isNotEmpty
+                              //     ? NetworkImage(contact.profilePicture!)
+                              null,
+                          // backgroundImage: contact.profilePicture != null &&
+                          //         contact.profilePicture!.isNotEmpty
+                          //     ? NetworkImage(contact.profilePicture!)
+                          //     : null,
                           child: contact.profilePicture == null
                               ? Icon(Icons.person)
                               : null,
@@ -101,7 +107,10 @@ class _TestScreenState extends State<TestScreen> {
             // Add Member Button
             ElevatedButton.icon(
               onPressed: () {
-                Get.toNamed('/groupScreen');
+                Get.to(() => GroupScreen(
+                    name: nameController.text,
+                    groupId: widget.group.groupId ?? "",
+                    isUpdate: true));
               },
               icon: Icon(Icons.add),
               label: Text('Add Member'),

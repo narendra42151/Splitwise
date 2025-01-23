@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Comman/TestScreen.dart';
 import 'package:splitwise/View/Group/GroupDetails.dart';
+import 'package:splitwise/View/Group/GroupScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class GroupListScreen extends StatelessWidget {
@@ -23,7 +24,8 @@ class GroupListScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                Get.toNamed("/groupScreen");
+                Get.to(
+                    () => GroupScreen(name: "", groupId: "", isUpdate: false));
               },
               icon: Icon(Icons.add))
         ],

@@ -110,7 +110,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               itemBuilder: (context, index) {
                 final expense = controller.expenses[index];
                 return SplitRequestCard(
-                  onTap: () => PaymentRequestScreen(),
+                  onTap: () {
+                    Get.to(() => PaymentRequestScreen(
+                          expenseModel: expense,
+                        ));
+                  },
                   expenseModel: expense,
                 );
               },

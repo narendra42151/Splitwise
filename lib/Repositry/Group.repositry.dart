@@ -63,21 +63,28 @@ class GroupRepository {
 
   // Update group details
   Future<dynamic> updateGroupDetails(
-      String groupId, String name, List<String> members) async {
+      String groupId, String name, RxList<CustomContact> members) async {
     try {
       final accessToken = await _tokenManager.getAccessToken();
+      final List<String> userIds = members
+          .map((contact) =>
+              contact.userId ?? '') // Use empty string if userId is null
+          .where((id) => id.isNotEmpty) // Remove empty strings if any
+          .toList();
+
       final Map<String, dynamic> data = {
         'name': name,
-        'members': members,
+        'members': userIds, // List of userIds as strings
       };
 
       final Map<String, String> headers = {
-        'Authorization': 'Bearer $accessToken',
+        'authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       };
 
-      final response = await _apiServices.putApiWithHeaders(
-          data, '/groups/$groupId', headers);
+      final response = await _apiServices.postApiWithHeaders(
+          data, '/update-group/${groupId}', headers);
+      print(response.toString());
       return response['data'];
     } catch (e) {
       throw Exception('Failed to update group details: $e');

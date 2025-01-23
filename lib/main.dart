@@ -5,7 +5,7 @@ import 'package:splitwise/Comman/Colors.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 import 'package:splitwise/View/User/ChangePasswordScreen.dart';
 import 'package:splitwise/View/Group/GroupListScreen.dart';
-import 'package:splitwise/View/Group/GroupScreen.dart';
+
 import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/View/User/LoginScreen.dart';
 import 'package:splitwise/View/User/ProfileEditScreen.dart';
@@ -119,11 +119,11 @@ class MyApp extends StatelessWidget {
               page: () => ChangePasswordScreen(),
               transition: Transition.rightToLeft,
             ),
-            GetPage(
-              name: '/groupScreen',
-              page: () => GroupScreen(),
-              transition: Transition.rightToLeft,
-            ),
+            // GetPage(
+            //   name: '/groupScreen',
+            //   page: () => GroupScreen(isUpdate: false,),
+            //   transition: Transition.rightToLeft,
+            // ),
             GetPage(
               name: '/groupScreenList',
               page: () => GroupListScreen(),
