@@ -18,117 +18,106 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // Initialize controllers
   final ThemeController themeController = Get.put(ThemeController());
   final AuthController authController = Get.put(AuthController());
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => GetMaterialApp(
-          title: 'Payment App',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData.light().copyWith(
-            primaryColor: AppColors.lightPrimaryColor,
-            scaffoldBackgroundColor: AppColors.lightBackgroundColor,
-            colorScheme: ColorScheme.light(
-              primary: AppColors.lightPrimaryColor,
-              secondary: AppColors.lightSecondaryColor,
+    return Obx(() {
+      return GetMaterialApp(
+        title: 'Payment App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.light().copyWith(
+          primaryColor: AppColors.lightPrimaryColor,
+          scaffoldBackgroundColor: AppColors.lightBackgroundColor,
+          colorScheme: ColorScheme.light(
+            primary: AppColors.lightPrimaryColor,
+            secondary: AppColors.lightSecondaryColor,
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.lightPrimaryColor),
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.lightPrimaryColor),
             ),
           ),
-          darkTheme: ThemeData.dark().copyWith(
-            primaryColor: AppColors.darkPrimaryColor,
-            scaffoldBackgroundColor: AppColors.darkBackgroundColor,
-            colorScheme: ColorScheme.dark(
-              primary: AppColors.darkPrimaryColor,
-              secondary: AppColors.darkSecondaryColor,
+        ),
+        darkTheme: ThemeData.dark().copyWith(
+          primaryColor: AppColors.darkPrimaryColor,
+          scaffoldBackgroundColor: AppColors.darkBackgroundColor,
+          colorScheme: ColorScheme.dark(
+            primary: AppColors.darkPrimaryColor,
+            secondary: AppColors.darkSecondaryColor,
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.grey[800],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade700),
             ),
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              fillColor: Colors.grey[800],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade700),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade700),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.darkPrimaryColor),
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade700),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.darkPrimaryColor),
             ),
           ),
-          themeMode: themeController.isDarkMode.value
-              ? ThemeMode.dark
-              : ThemeMode.light,
-
-          // Initial Route
-          initialRoute: '/splash',
-
-          // Custom Transition
-          defaultTransition: Transition.fadeIn,
-          transitionDuration: Duration(milliseconds: 300),
-
-          // Route Management
-          getPages: [
-            GetPage(
-              name: '/splash',
-              page: () => SplashScreen(),
-              transition: Transition.fadeIn,
-            ),
-            GetPage(
-              name: '/login',
-              page: () => LoginScreen(),
-              transition: Transition.fadeIn,
-            ),
-            GetPage(
-              name: '/register',
-              page: () => RegisterScreen(),
-              transition: Transition.rightToLeft,
-            ),
-            GetPage(
-              name: '/home',
-              page: () => HomeScreen(),
-              transition: Transition.fadeIn,
-            ),
-            GetPage(
-              name: '/profile/edit',
-              page: () => ProfileEditScreen(),
-              transition: Transition.rightToLeft,
-            ),
-            GetPage(
-              name: '/updatePassword',
-              page: () => ChangePasswordScreen(),
-              transition: Transition.rightToLeft,
-            ),
-            // GetPage(
-            //   name: '/groupScreen',
-            //   page: () => GroupScreen(isUpdate: false,),
-            //   transition: Transition.rightToLeft,
-            // ),
-            GetPage(
-              name: '/groupScreenList',
-              page: () => GroupListScreen(),
-              transition: Transition.rightToLeft,
-            ),
-          ],
-        ));
+        ),
+        themeMode:
+            themeController.isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
+        initialRoute: '/splash',
+        defaultTransition: Transition.fadeIn,
+        transitionDuration: Duration(milliseconds: 300),
+        getPages: [
+          GetPage(
+            name: '/splash',
+            page: () => SplashScreen(),
+            transition: Transition.fadeIn,
+          ),
+          GetPage(
+            name: '/login',
+            page: () => LoginScreen(),
+            transition: Transition.fadeIn,
+          ),
+          GetPage(
+            name: '/register',
+            page: () => RegisterScreen(),
+            transition: Transition.rightToLeft,
+          ),
+          GetPage(
+            name: '/home',
+            page: () => HomeScreen(),
+            transition: Transition.fadeIn,
+          ),
+          GetPage(
+            name: '/profile/edit',
+            page: () => ProfileEditScreen(),
+            transition: Transition.rightToLeft,
+          ),
+          GetPage(
+            name: '/updatePassword',
+            page: () => ChangePasswordScreen(),
+            transition: Transition.rightToLeft,
+          ),
+          GetPage(
+            name: '/groupScreenList',
+            page: () => GroupListScreen(),
+            transition: Transition.rightToLeft,
+          ),
+        ],
+      );
+    });
   }
 }

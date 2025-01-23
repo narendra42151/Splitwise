@@ -230,14 +230,12 @@ class GroupController extends GetxController {
       final response = await _repository.updateGroupDetails(
           groupId, groupName, selectedContacts);
       if (response != null) {
-        fetchUserGroups();
+        await fetchUserGroups();
         Get.snackbar(
           "Success",
           "Group Updated successfully!",
           snackPosition: SnackPosition.BOTTOM,
         );
-
-        Get.toNamed("/home");
       } else {}
       clearContacts();
       Get.snackbar(
@@ -245,7 +243,6 @@ class GroupController extends GetxController {
         "Group Updated",
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.back();
     } catch (e) {
       Get.snackbar(
         "Error",

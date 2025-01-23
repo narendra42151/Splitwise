@@ -21,43 +21,44 @@ class _TestScreenState extends State<TestScreen> {
   void initState() {
     super.initState();
 
-    // Set the initial group name
-    nameController.text = widget.group.name ?? '';
+    // Delay the updates to reactive state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Set the initial group name
+      nameController.text = widget.group.name ?? '';
 
-    // Clear the existing selected contacts
-    controller.selectedContacts.clear();
+      // Clear the existing selected contacts
+      controller.selectedContacts.clear();
 
-    // Populate selectedContacts with group members
-    for (Members member in widget.group.members ?? []) {
-      print(member.phoneNumber);
-      var memberPhoneNumber =
-          member.phoneNumber?.replaceAll(RegExp(r'\D'), '') ?? '';
+      // Populate selectedContacts with group members
+      for (Members member in widget.group.members ?? []) {
+        var memberPhoneNumber =
+            member.phoneNumber?.replaceAll(RegExp(r'\D'), '') ?? '';
 
-      // Check if the member already exists in allContacts
-      final existingContact = controller.allContacts.firstWhereOrNull(
-        (contact) {
-          var contactPhoneNumber =
-              contact.phoneNumber.replaceAll(RegExp(r'\D'), '');
-          if (contactPhoneNumber.startsWith('91')) {
-            contactPhoneNumber = contactPhoneNumber
-                .substring(2); // Remove the first two characters
-          }
-          return contactPhoneNumber == memberPhoneNumber;
-        },
-      );
+        // Check if the member already exists in allContacts
+        final existingContact = controller.allContacts.firstWhereOrNull(
+          (contact) {
+            var contactPhoneNumber =
+                contact.phoneNumber.replaceAll(RegExp(r'\D'), '');
+            if (contactPhoneNumber.startsWith('91')) {
+              contactPhoneNumber = contactPhoneNumber.substring(2);
+            }
+            return contactPhoneNumber == memberPhoneNumber;
+          },
+        );
 
-      if (existingContact != null) {
-        // If member exists, add to selectedContacts
-        controller.selectedContacts.add(existingContact);
-      } else {
-        // If member doesn't exist in contacts, add a custom contact
-        controller.selectedContacts.add(CustomContact(
-          displayName: member.username ?? '',
-          phoneNumber: member.phoneNumber ?? '',
-          profilePicture: member.profilePicture,
-        ));
+        if (existingContact != null) {
+          // If member exists, add to selectedContacts
+          controller.selectedContacts.add(existingContact);
+        } else {
+          // If member doesn't exist in contacts, add a custom contact
+          controller.selectedContacts.add(CustomContact(
+            displayName: member.username ?? '',
+            phoneNumber: member.phoneNumber ?? '',
+            profilePicture: member.profilePicture,
+          ));
+        }
       }
-    }
+    });
   }
 
   @override
@@ -123,6 +124,7 @@ class _TestScreenState extends State<TestScreen> {
                     : () async {
                         await controller.updateGroup(
                             nameController.text, widget.group.groupId ?? "");
+                        Get.toNamed("/home");
                       },
                 child: isLoading
                     ? const CircularProgressIndicator(
