@@ -203,6 +203,7 @@ class GroupController extends GetxController {
           "Group created successfully!",
           snackPosition: SnackPosition.BOTTOM,
         );
+        await fetchUserGroups();
         clearContacts();
       }
     } catch (e) {

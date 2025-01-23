@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
+
 import 'package:splitwise/Utils/Utils.dart';
+
 import 'package:splitwise/data/AppException.dart';
 import 'package:splitwise/data/Network/base_api_services.dart';
 
@@ -12,7 +15,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .get(Uri.parse(DEV + url))
+          .get(Uri.parse(DEVURL + url))
           .timeout(const Duration(seconds: 10));
       responseJson = returnResponse(response);
     } on SocketException {
@@ -20,6 +23,7 @@ class NetworkApiServices extends BaseApiServices {
       throw InternetException();
     } on TimeoutException {
       print("Request timed out");
+
       throw RequestTimeOutException();
     } on HttpException {
       print("HTTP exception occurred");
@@ -35,7 +39,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .post(Uri.parse(DEV + url),
+          .post(Uri.parse(DEVURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -45,6 +49,7 @@ class NetworkApiServices extends BaseApiServices {
       throw InternetException();
     } on TimeoutException {
       print("Request timed out");
+
       throw RequestTimeOutException();
     } on HttpException {
       print("HTTP exception occurred");
@@ -61,7 +66,8 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .post(Uri.parse(DEV + url), headers: headers, body: jsonEncode(data))
+          .post(Uri.parse(DEVURL + url),
+              headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
       responseJson = returnResponse(response);
     } on SocketException {
@@ -69,6 +75,7 @@ class NetworkApiServices extends BaseApiServices {
       throw InternetException();
     } on TimeoutException {
       print("Request timed out");
+
       throw RequestTimeOutException();
     } on HttpException {
       print("HTTP exception occurred");
@@ -85,7 +92,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .get(Uri.parse(DEV + url), headers: headers)
+          .get(Uri.parse(DEVURL + url), headers: headers)
           .timeout(const Duration(seconds: 10));
       responseJson = returnResponse(response);
     } on SocketException {
@@ -93,6 +100,7 @@ class NetworkApiServices extends BaseApiServices {
       throw InternetException();
     } on TimeoutException {
       print("Request timed out");
+
       throw RequestTimeOutException();
     } on HttpException {
       print("HTTP exception occurred");
@@ -108,7 +116,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .patch(Uri.parse(DEV + url),
+          .patch(Uri.parse(DEVURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -129,7 +137,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .put(Uri.parse(DEV + url),
+          .put(Uri.parse(DEVURL + url),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -151,7 +159,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .patch(Uri.parse(DEV + url),
+          .patch(Uri.parse(DEVURL + url),
               headers: headers ?? {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));
@@ -173,7 +181,7 @@ class NetworkApiServices extends BaseApiServices {
     dynamic responseJson;
     try {
       final response = await http
-          .put(Uri.parse(DEV + url),
+          .put(Uri.parse(DEVURL + url),
               headers: headers ?? {'Content-Type': 'application/json'},
               body: jsonEncode(data))
           .timeout(const Duration(seconds: 10));

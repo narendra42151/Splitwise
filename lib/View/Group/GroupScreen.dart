@@ -125,11 +125,30 @@ class _GroupScreenState extends State<GroupScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
                 onPressed: () async {
-                  widget.isUpdate
-                      ? Navigator.of(context).pop()
-                      : groupController.createGroup(
-                          groupName.text,
-                        );
+                  if (groupName.text.trim().isEmpty) {
+                    // Show a dialog box if the group name is empty
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Input Required"),
+                        content: const Text(
+                            "Group name is required. Please enter a group name."),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Proceed with the appropriate action
+                    widget.isUpdate
+                        ? Navigator.of(context).pop()
+                        : groupController.createGroup(groupName.text.trim());
+                  }
                 },
                 child: widget.isUpdate
                     ? Text("Add Member")
