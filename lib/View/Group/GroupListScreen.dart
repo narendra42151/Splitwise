@@ -14,6 +14,13 @@ class GroupListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Groups"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Get.toNamed("/groupScreen");
+              },
+              icon: Icon(Icons.add))
+        ],
       ),
       body: Column(
         children: [
@@ -59,8 +66,10 @@ class GroupListScreen extends StatelessWidget {
                       child: const Icon(Icons.group),
                     ),
                     title: Text(group.name ?? "Unnamed Group"),
-                    subtitle:
-                        Text("Created by: ${group.createdBy ?? 'Unknown'}"),
+                    subtitle: Text(
+                        "Created by: ${group.createdBy!.username ?? 'Unknown'}"),
+                    trailing:
+                        IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
                     onTap: () {
                       Get.to(() => GroupDetailsScreen(
                             groupId: group.groupId ?? "",

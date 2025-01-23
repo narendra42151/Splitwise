@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:splitwise/View/Group/GroupDetails.dart';
+import 'package:splitwise/View/Group/GroupListScreen.dart';
+import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class SplitExpenseScreen extends StatefulWidget {
@@ -233,9 +235,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
                 backgroundColor: Colors.green,
                 colorText: Colors.white,
               );
-              Get.offAll(() => GroupDetailsScreen(
-                    groupId: controller.groupId,
-                  ));
+              Get.offAll(() => HomeScreen());
             },
             child: Text("Confirm"),
           ),

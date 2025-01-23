@@ -34,9 +34,6 @@ class Groupdetailcontroller extends GetxController {
       // Fetch parsed response from the repository
       final response = await _repository.fetchFromApi(groupId, page);
 
-      print("From Controller");
-      print(response.toString());
-
       // Validate response structure
       if (!response.containsKey('data')) {
         throw Exception('Invalid response format: Missing "data" key');
@@ -44,7 +41,6 @@ class Groupdetailcontroller extends GetxController {
 
       if (response['success'] == true) {
         final data = response['data'];
-        print(data['group']);
 
         // Update group details
 

@@ -10,8 +10,6 @@ import 'package:splitwise/View/HomeScreen.dart';
 import 'package:splitwise/View/User/LoginScreen.dart';
 import 'package:splitwise/View/User/ProfileEditScreen.dart';
 import 'package:splitwise/View/User/RegisterScreen.dart';
-
-// import 'package:splitwise/View/HomeScreen.dart'; // Replace this with your actual HomeScreen
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
 void main() {
