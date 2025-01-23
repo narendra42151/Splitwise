@@ -125,7 +125,7 @@ class GroupController extends GetxController {
           "Contact Not Found",
           "${contact.displayName} is not registered.",
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
+          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
           colorText: Colors.white,
         );
       }
@@ -135,7 +135,7 @@ class GroupController extends GetxController {
         "Error",
         error.value,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
+        backgroundColor: const Color.fromARGB(255, 106, 106, 108),
         colorText: Colors.white,
       );
     } finally {

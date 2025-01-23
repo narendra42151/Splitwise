@@ -32,7 +32,8 @@ class AuthController extends GetxController {
         "Error", // Title
         error.value, // Message
         snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: Colors.red, // Background color of the Snackbar
+        backgroundColor: const Color.fromARGB(
+            255, 211, 119, 248), // Background color of the Snackbar
         colorText: Colors.white, // Text color
       );
     } finally {
@@ -57,7 +58,8 @@ class AuthController extends GetxController {
         "Error", // Title
         error.value, // Message
         snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: Colors.red, // Background color of the Snackbar
+        backgroundColor: const Color.fromARGB(
+            255, 211, 119, 248), // Background color of the Snackbar
         colorText: Colors.white, // Text color
       );
     } finally {
@@ -94,7 +96,8 @@ class AuthController extends GetxController {
     } catch (e) {
       error.value = e.toString();
       Get.snackbar('Error', 'Failed to update profile',
-          backgroundColor: Colors.red, colorText: Colors.white);
+          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
+          colorText: Colors.white);
     } finally {
       isLoading.value = false;
     }
@@ -113,7 +116,8 @@ class AuthController extends GetxController {
     } catch (e) {
       error.value = e.toString();
       Get.snackbar('Error', e.toString(),
-          backgroundColor: Colors.red, colorText: Colors.white);
+          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
+          colorText: Colors.white);
     } finally {
       isLoading.value = false;
     }
@@ -123,19 +127,21 @@ class AuthController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  Future<void> getUserDetails() async {
+  Future<dynamic> getUserDetails() async {
     try {
       isLoading.value = true;
       error.value = '';
 
       // Fetch user details from repository
       final userDetails = await _repository.getUserDetails();
+      print(userDetails.toString());
 
       // Update the user state
       user.value = userDetails;
       if (user.value == null) {
         Get.toNamed("/login");
       }
+      return user.value;
 
       // You can handle any additional logic here (e.g., navigating to a different screen if needed)
     } catch (e) {
@@ -147,7 +153,8 @@ class AuthController extends GetxController {
         "Error", // Title
         error.value, // Message
         snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: Colors.red, // Background color of the Snackbar
+        backgroundColor: const Color.fromARGB(
+            255, 211, 119, 248), // Background color of the Snackbar
         colorText: Colors.white, // Text color
       );
     } finally {

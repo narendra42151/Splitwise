@@ -239,7 +239,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
         "Error",
         "Please select members to split with",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
+        backgroundColor: const Color.fromARGB(255, 106, 106, 108),
         colorText: Colors.white,
       );
       return;

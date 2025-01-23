@@ -27,7 +27,10 @@ class _SplashScreenState extends State<SplashScreen> {
     if (accessToken != null) {
       // If there's an access token, attempt to fetch user details
       try {
-        await authController.getUserDetails(); // Fetch user details
+        final user = await authController.getUserDetails();
+        if (user.value == null || user == null) {
+          Get.toNamed("/login");
+        } // Fetch user details
         // After fetching user details, navigate to home if successful
         Get.offAllNamed('/home');
       } catch (e) {

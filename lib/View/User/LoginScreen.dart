@@ -208,24 +208,6 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     // Error Message with Animation
-                    Obx(() => AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
-                          child: controller.error.value.isNotEmpty
-                              ? Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text(
-                                    controller.error.value,
-                                    style: TextStyle(
-                                      color: themeController.isDarkMode.value
-                                          ? AppColors.darkErrorColor
-                                          : AppColors.lightErrorColor,
-                                      fontSize: 14,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        )),
                   ],
                 ),
               ),
