@@ -4,7 +4,7 @@ class ExpenceSplitModel {
   String? expenseId;
   String? groupId;
   String? description;
-  int? amount;
+  double? amount;
   List<Members>? paidBy;
   List<Members>? splitAmong;
   String? splitType;
@@ -80,7 +80,7 @@ class ExpenceSplitModel {
 class DetailedSplit {
   String? from;
   String? to;
-  int? amount;
+  double? amount;
 
   DetailedSplit({this.from, this.to, this.amount});
 

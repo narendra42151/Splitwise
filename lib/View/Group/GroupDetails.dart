@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
-import 'package:splitwise/View/Group/SplitExpenseScreen.dart';
+
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class GroupDetailsScreen extends StatefulWidget {

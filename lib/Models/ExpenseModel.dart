@@ -47,7 +47,7 @@ class ExpenseDetails {
   ExpenseDetails.fromJson(Map<String, dynamic> json) {
     expenseId = json['_id'];
     description = json['description'];
-    amount = (json['amount'] ?? 0).toDouble();
+    amount = json['amount'] != null ? (json['amount'] as num).toDouble() : null;
     if (json['paidBy'] != null) {
       paidBy = <Members>[];
       json['paidBy'].forEach((v) {
@@ -94,14 +94,14 @@ class ExpenseDetails {
 class DetailedSplit {
   String? from;
   String? to;
-  int? amount;
+  double? amount;
 
   DetailedSplit({this.from, this.to, this.amount});
 
   DetailedSplit.fromJson(Map<String, dynamic> json) {
     from = json['from'];
     to = json['to'];
-    amount = json['amount'];
+    amount = json['amount'] != null ? (json['amount'] as num).toDouble() : null;
   }
 
   Map<String, dynamic> toJson() {
