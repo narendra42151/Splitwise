@@ -16,7 +16,7 @@ class Groupdetailcontroller extends GetxController {
   final selectedMembers = <bool>[].obs;
   final splitAmounts = <double>[].obs;
 
-  final String groupId;
+  String groupId;
   final int limit;
 
   Groupdetailcontroller({required this.groupId, this.limit = 5});

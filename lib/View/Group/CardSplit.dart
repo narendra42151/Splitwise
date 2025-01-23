@@ -2,179 +2,236 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
 
-class SplitRequestCard extends StatefulWidget {
+class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
-  SplitRequestCard({required this.expenseModel, super.key});
-  @override
-  State<StatefulWidget> createState() {
-    return _SplitRequestCardState();
-  }
-}
 
-class _SplitRequestCardState extends State<SplitRequestCard> {
+  const SplitRequestCard({Key? key, required this.expenseModel})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final expenseDetails = widget.expenseModel.expenseDetails;
+    final theme = Theme.of(context);
+    final expenseDetails = expenseModel.expenseDetails;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
-      color: Colors.grey[900],
+      elevation: 8,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Split request",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "₹${expenseDetails!.amount}",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                // User avatars
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: Colors.purple,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundImage: AssetImage(
-                            'assets/me.png'), // Replace with actual image
-                      ),
+      color: isDark ? Colors.grey[800] : Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: isDark
+                ? [Colors.grey[900]!, Colors.grey[800]!]
+                : [Colors.white, Colors.grey[100]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Split Request",
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Positioned(
-                      left: 16,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundImage: AssetImage(
-                            'assets/me.png'), // Replace with actual image
-                      ),
-                    ),
-                    Positioned(
-                      left: 32,
-                      child: CircleAvatar(
-                        radius: 12,
-                        backgroundImage: AssetImage(
-                            'assets/me.png'), // Replace with actual image
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 12),
-                // Progress bar
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LinearProgressIndicator(
-                        value: 0.25, // 1/4 paid
-                        backgroundColor: Colors.grey,
-                        color: Colors.blue,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        "${expenseDetails.paidBy!.length}/4 paid",
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
                   ),
+                  Icon(
+                    Icons.more_vert,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Amount Section
+              Text(
+                "₹${expenseDetails!.amount}",
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start, // Align text and icons to the start
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+              ),
+              const SizedBox(height: 16),
+
+              // User & Progress Section
+              Row(
+                children: [
+                  // Stacked Avatars
+                  _buildStackedAvatars(),
+                  const SizedBox(width: 16),
+
+                  // Progress Indicator
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.access_time,
-                          color: Colors.grey,
-                          size: 16,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: 0.25,
+                            backgroundColor:
+                                isDark ? Colors.grey[700] : Colors.grey[300],
+                            color: Colors.blue,
+                            minHeight: 8,
+                          ),
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(height: 8),
                         Text(
-                          "Unpaid · ${_formatTime(expenseDetails.createdAt ?? "")}", // Format time
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          "${expenseDetails.paidBy!.length}/4 Paid",
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black54,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.grey,
-                      size: 16,
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Details Section
+              _buildDetailsRow(isDark, expenseDetails),
+              const SizedBox(height: 16),
+
+              // Pay Button
+              _buildPayButton(isDark),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStackedAvatars() {
+    return Stack(
+      children: [
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.purple.shade200,
+          child: const CircleAvatar(
+            radius: 18,
+            backgroundImage: AssetImage('assets/me.png'),
+          ),
+        ),
+        Positioned(
+          left: 24,
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.green.shade200,
+            child: const CircleAvatar(
+              radius: 18,
+              backgroundImage: AssetImage('assets/me.png'),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 48,
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.blue.shade200,
+            child: const CircleAvatar(
+              radius: 18,
+              backgroundImage: AssetImage('assets/me.png'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsRow(bool isDark, dynamic expenseDetails) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                  size: 16,
                 ),
-                SizedBox(height: 8), // Add spacing between rows
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0), // Align text with the icon
-                  child: Text(
-                    "${expenseDetails.description}",
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                    textAlign: TextAlign.start,
+                const SizedBox(width: 8),
+                Text(
+                  "Pending · ${_formatTime(expenseDetails.createdAt ?? "")}",
+                  style: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    fontSize: 12,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Add your functionality here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: Center(
-                child: Text(
-                  "Pay",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            Text("${expenseDetails.description}",
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : Colors.black54,
+                  fontSize: 12,
+                )),
           ],
         ),
+        Icon(
+          Icons.arrow_forward_ios,
+          color: isDark ? Colors.white54 : Colors.black54,
+          size: 16,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPayButton(bool isDark) {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.payment, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            "Pay Now",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.1,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+// Existing time formatting function
 String _formatTime(String createdAt) {
   try {
-    // Parse the string into a DateTime object
     DateTime parsedDate = DateTime.parse(createdAt);
-    // Format it to "hh:mm a" format
     return DateFormat('hh:mm a').format(parsedDate);
   } catch (e) {
-    // If parsing fails, return the original string
     return createdAt;
   }
 }

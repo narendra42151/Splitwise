@@ -19,6 +19,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    // Remove existing controller if it exists
+    if (Get.isRegistered<Groupdetailcontroller>()) {
+      Get.delete<Groupdetailcontroller>();
+    }
+
     final controller = Get.put(Groupdetailcontroller(groupId: widget.groupId));
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -40,7 +45,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         elevation: 0,
         leading: IconButton(
             onPressed: () {
-              Get.toNamed('/home');
+              Get.toNamed('/groupScreenList');
             },
             icon: Icon(Icons.arrow_back)),
         title: Text(
@@ -106,42 +111,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 return SplitRequestCard(
                   expenseModel: expense,
                 );
-                // return Card(
-                //   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                //   elevation: 2,
-                //   child:
-                //    ListTile(
-                //     contentPadding: EdgeInsets.all(16),
-                //     leading: CircleAvatar(
-                //       backgroundColor: Theme.of(context).colorScheme.primary,
-                //       child: Icon(
-                //         Icons.receipt,
-                //         color: Theme.of(context).colorScheme.onPrimary,
-                //       ),
-                //     ),
-                //     title: Text(
-                //       expense.expenseDetails!.description ?? "",
-                //       style: TextStyle(
-                //         fontWeight: FontWeight.bold,
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //     subtitle: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         SizedBox(height: 8),
-                //         Text(
-                //           'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
-                //           style: TextStyle(
-                //             color: Theme.of(context).colorScheme.primary,
-                //             fontWeight: FontWeight.w500,
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //     trailing: Icon(Icons.chevron_right),
-                //   ),
-                // );
               },
             ),
             if (controller.isLoading.value && !controller.expenses.isEmpty)
