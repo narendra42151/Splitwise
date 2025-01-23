@@ -235,7 +235,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
                 backgroundColor: Colors.green,
                 colorText: Colors.white,
               );
-              Get.offAll(() => HomeScreen());
+              Get.offAll(() => GroupDetailsScreen(groupId: controller.groupId));
             },
             child: Text("Confirm"),
           ),

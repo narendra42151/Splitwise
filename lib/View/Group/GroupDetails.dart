@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
+import 'package:splitwise/View/Group/CardSplit.dart';
 
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
@@ -37,6 +38,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        leading: IconButton(
+            onPressed: () {
+              Get.toNamed('/home');
+            },
+            icon: Icon(Icons.arrow_back)),
         title: Text(
           'Group Details',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -97,41 +103,45 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               itemCount: controller.expenses.length,
               itemBuilder: (context, index) {
                 final expense = controller.expenses[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  elevation: 2,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: Icon(
-                        Icons.receipt,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
-                    title: Text(
-                      expense.expenseDetails!.description ?? "",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 8),
-                        Text(
-                          'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Icon(Icons.chevron_right),
-                  ),
+                return SplitRequestCard(
+                  expenseModel: expense,
                 );
+                // return Card(
+                //   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                //   elevation: 2,
+                //   child:
+                //    ListTile(
+                //     contentPadding: EdgeInsets.all(16),
+                //     leading: CircleAvatar(
+                //       backgroundColor: Theme.of(context).colorScheme.primary,
+                //       child: Icon(
+                //         Icons.receipt,
+                //         color: Theme.of(context).colorScheme.onPrimary,
+                //       ),
+                //     ),
+                //     title: Text(
+                //       expense.expenseDetails!.description ?? "",
+                //       style: TextStyle(
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 16,
+                //       ),
+                //     ),
+                //     subtitle: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         SizedBox(height: 8),
+                //         Text(
+                //           'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
+                //           style: TextStyle(
+                //             color: Theme.of(context).colorScheme.primary,
+                //             fontWeight: FontWeight.w500,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //     trailing: Icon(Icons.chevron_right),
+                //   ),
+                // );
               },
             ),
             if (controller.isLoading.value && !controller.expenses.isEmpty)
