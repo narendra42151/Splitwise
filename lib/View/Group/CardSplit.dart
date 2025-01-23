@@ -87,7 +87,10 @@ class SplitRequestCard extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LinearProgressIndicator(
-                            value: 0.25,
+                            value:
+                                (expenseModel.expenseDetails!.paidBy!.length) /
+                                    (expenseModel
+                                        .expenseDetails!.splitAmong!.length),
                             backgroundColor:
                                 isDark ? Colors.grey[700] : Colors.grey[300],
                             color: Colors.blue,

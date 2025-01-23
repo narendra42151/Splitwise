@@ -230,6 +230,7 @@ class GroupController extends GetxController {
       final response = await _repository.updateGroupDetails(
           groupId, groupName, selectedContacts);
       if (response != null) {
+        fetchUserGroups();
         Get.snackbar(
           "Success",
           "Group Updated successfully!",
