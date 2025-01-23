@@ -63,7 +63,7 @@ class _TestScreenState extends State<TestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Group')),
+      appBar: AppBar(title: const Text('Edit Group')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -72,59 +72,63 @@ class _TestScreenState extends State<TestScreen> {
             // Group Name Input Field
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Group Name'),
+              decoration: const InputDecoration(labelText: 'Group Name'),
             ),
             const SizedBox(height: 20),
 
             // Members List
             Expanded(
-              child: Obx(() => ListView.builder(
-                    itemCount: controller.selectedContacts.length,
-                    itemBuilder: (context, index) {
-                      final contact = controller.selectedContacts[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              //  contact.profilePicture != null &&
-                              //         contact.profilePicture!.isNotEmpty
-                              //     ? NetworkImage(contact.profilePicture!)
-                              null,
-                          // backgroundImage: contact.profilePicture != null &&
-                          //         contact.profilePicture!.isNotEmpty
-                          //     ? NetworkImage(contact.profilePicture!)
-                          //     : null,
-                          child: contact.profilePicture == null
-                              ? Icon(Icons.person)
-                              : null,
-                        ),
-                        title: Text(contact.displayName),
-                        subtitle: Text(contact.phoneNumber),
-                      );
-                    },
-                  )),
+              child: Obx(() {
+                final selectedContacts = controller.selectedContacts;
+                return ListView.builder(
+                  itemCount: selectedContacts.length,
+                  itemBuilder: (context, index) {
+                    final contact = selectedContacts[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: contact.profilePicture != null &&
+                                contact.profilePicture!.isNotEmpty
+                            ? NetworkImage(contact.profilePicture!)
+                            : null,
+                        child: contact.profilePicture == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(contact.displayName),
+                      subtitle: Text(contact.phoneNumber),
+                    );
+                  },
+                );
+              }),
             ),
 
             // Add Member Button
             ElevatedButton.icon(
               onPressed: () {
-                Get.to(() => GroupScreen(
-                    name: nameController.text,
-                    groupId: widget.group.groupId ?? "",
-                    isUpdate: true));
+                Get.to(() => GroupScreen(isUpdate: true));
               },
-              icon: Icon(Icons.add),
-              label: Text('Add Member'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Member'),
             ),
             const SizedBox(height: 20),
 
             // Save Changes Button
-            ElevatedButton(
-              onPressed: () async {
-                // Update the group using selectedContacts and group name
-                await controller.createGroup(nameController.text);
-              },
-              child: Text('Save Changes'),
-            ),
+            Obx(() {
+              final isLoading = controller.isLoading.value;
+              return ElevatedButton(
+                onPressed: isLoading
+                    ? null // Disable button when loading
+                    : () async {
+                        await controller.updateGroup(
+                            nameController.text, widget.group.groupId ?? "");
+                      },
+                child: isLoading
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : const Text('Save Changes'),
+              );
+            }),
           ],
         ),
       ),

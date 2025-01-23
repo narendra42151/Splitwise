@@ -215,6 +215,7 @@ class GroupController extends GetxController {
   }
 
   Future<void> updateGroup(String groupName, String groupId) async {
+    isLoading.value = true;
     if (selectedContacts.isEmpty) {
       Get.snackbar(
         "Error",
@@ -225,6 +226,7 @@ class GroupController extends GetxController {
     }
 
     try {
+      isLoading.value = true;
       final response = await _repository.updateGroupDetails(
           groupId, groupName, selectedContacts);
       if (response != null) {
@@ -233,14 +235,24 @@ class GroupController extends GetxController {
           "Group Updated successfully!",
           snackPosition: SnackPosition.BOTTOM,
         );
-        clearContacts();
-      }
+
+        Get.toNamed("/home");
+      } else {}
+      clearContacts();
+      Get.snackbar(
+        "Group",
+        "Group Updated",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      Get.back();
     } catch (e) {
       Get.snackbar(
         "Error",
         "Failed to create group: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 }

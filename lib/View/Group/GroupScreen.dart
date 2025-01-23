@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Comman/TestScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
 class GroupScreen extends StatelessWidget {
   final bool isUpdate;
-  final String groupId;
-  final String name;
-  GroupScreen(
-      {required this.groupId, required this.name, required this.isUpdate});
+
+  GroupScreen({required this.isUpdate});
   final GroupController groupController = Get.put(GroupController());
 
   @override
@@ -97,15 +96,14 @@ class GroupScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () async {
-                isUpdate
-                    ? groupController.updateGroup(name, groupId)
-                    : groupController.createGroup(
-                        "Hello",
-                      );
-              },
-              child: const Text("Create Group"),
-            ),
+                onPressed: () async {
+                  isUpdate
+                      ? Navigator.of(context).pop()
+                      : groupController.createGroup(
+                          "Hello",
+                        );
+                },
+                child: isUpdate ? Text("Add Member") : Text("Create Group")),
           ),
         ],
       ),
