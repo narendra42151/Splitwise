@@ -112,11 +112,7 @@ class HomeScreen extends StatelessWidget {
                     ),
             ),
             const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () => Get.toNamed("/groupScreen"),
-              icon: const Icon(Icons.contacts),
-              label: const Text("Select Contacts"),
-            ),
+
             const SizedBox(height: 20),
 
             const SizedBox(height: 20),
@@ -162,10 +158,22 @@ class HomeScreen extends StatelessWidget {
                     ),
             ),
             ElevatedButton.icon(
-              onPressed: () async {
-                final _tokenManager = SecureTokenManager();
-                await _tokenManager.clearTokens();
-                Get.offAllNamed("/login");
+              onPressed: () {
+                Get.defaultDialog(
+                  title: "Logout Confirmation",
+                  middleText: "Are you sure you want to logout?",
+                  textConfirm: "Yes",
+                  textCancel: "No",
+                  confirmTextColor: Colors.white,
+                  onConfirm: () async {
+                    final _tokenManager = SecureTokenManager();
+                    await _tokenManager.clearTokens();
+                    Get.offAllNamed("/login"); // Navigate to login page
+                  },
+                  onCancel: () {
+                    Get.back(); // Close the dialog
+                  },
+                );
               },
               icon: const Icon(Icons.contacts),
               label: const Text("Logout"),

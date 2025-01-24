@@ -66,7 +66,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Implement split expense logic
-          Get.to(() => AmountInputScreen());
+          Get.to(() => AmountInputScreen(
+                groupId: widget.groupId,
+              ));
         },
         icon: Icon(Icons.group_add),
         label: Text('Split Expense'),

@@ -90,7 +90,7 @@ class AuthController extends GetxController {
       final updatedUser =
           await _repository.updateUserDetails(username, profilePicture);
       user.value = updatedUser;
-      Get.back();
+      await getUserDetails();
       Get.snackbar('Success', 'Profile updated successfully',
           backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
@@ -110,7 +110,7 @@ class AuthController extends GetxController {
       error.value = '';
 
       await _repository.changePassword(oldPassword, newPassword);
-      Get.back();
+
       Get.snackbar('Success', 'Password changed successfully',
           backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {

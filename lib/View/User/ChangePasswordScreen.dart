@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 
-class ChangePasswordScreen extends StatelessWidget {
+class ChangePasswordScreen extends StatefulWidget {
+  @override
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final AuthController authController = Get.find<AuthController>();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController currentPasswordController =
       TextEditingController();
+
   final TextEditingController newPasswordController = TextEditingController();
+
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  @override
+  void dispose() {
+    currentPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,16 +103,34 @@ class ChangePasswordScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Call the API or function to update the password
-                      authController.changePassword(
-                        oldPassword: currentPasswordController.text,
-                        newPassword: newPasswordController.text,
-                      );
-                    }
-                  },
-                  child: const Text("Change Password"),
+                  onPressed: authController.isLoading.value
+                      ? null // Disable button while loading
+                      : () {
+                          if (_formKey.currentState!.validate()) {
+                            // Directly call the controller method to change the password
+                            authController
+                                .changePassword(
+                              oldPassword: currentPasswordController.text,
+                              newPassword: newPasswordController.text,
+                            )
+                                .then((_) {
+                              Get.back(); // Navigate back after the password is changed
+                            });
+                          }
+                        },
+                  child: Obx(
+                    () => authController.isLoading.value
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color:
+                                  Colors.white, // Matches the button text color
+                            ),
+                          )
+                        : const Text("Change Password"),
+                  ),
                 ),
               ),
             ],

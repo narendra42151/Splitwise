@@ -14,15 +14,24 @@ class GroupScreen extends StatefulWidget {
 
 class _GroupScreenState extends State<GroupScreen> {
   final TextEditingController groupName = TextEditingController();
+  final TextEditingController searchContact = TextEditingController();
 
   @override
   void dispose() {
     groupName.dispose();
+    searchContact.dispose();
 
     super.dispose();
   }
 
   final GroupController groupController = Get.put(GroupController());
+  @override
+  void initState() {
+    if (!widget.isUpdate) {
+      groupController.clearContacts();
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +67,14 @@ class _GroupScreenState extends State<GroupScreen> {
                   height: 5,
                 ),
                 TextField(
+                  controller: searchContact,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
                     hintText: "Search name or number",
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8)),
                   ),
-                  onChanged: groupController.filterContacts,
+                  onChanged: (query) => groupController.filterContacts(query),
                 ),
               ],
             ),
@@ -124,35 +134,48 @@ class _GroupScreenState extends State<GroupScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-                onPressed: () async {
-                  if (groupName.text.trim().isEmpty) {
-                    // Show a dialog box if the group name is empty
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Input Required"),
-                        content: const Text(
-                            "Group name is required. Please enter a group name."),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Close the dialog
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      ),
-                    );
+              onPressed: () async {
+                // Check group name validation only if `widget.isUpdate` is true
+                if (!widget.isUpdate && groupName.text.trim().isEmpty) {
+                  // Show a dialog box if the group name is empty
+                  Get.dialog(
+                    AlertDialog(
+                      title: const Text("Input Required"),
+                      content: const Text(
+                          "Group name is required. Please enter a group name."),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Get.back(); // Close the dialog
+                          },
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  // Handle create or update logic
+                  if (widget.isUpdate) {
+                    Get.back(); // Close the current screen if updating
                   } else {
-                    // Proceed with the appropriate action
-                    widget.isUpdate
-                        ? Navigator.of(context).pop()
-                        : groupController.createGroup(groupName.text.trim());
+                    await groupController.createGroup(groupName.text.trim());
+                    Get.toNamed("/groupScreenList");
                   }
-                },
-                child: widget.isUpdate
-                    ? Text("Add Member")
-                    : Text("Create Group")),
+                }
+              },
+              child: Obx(() {
+                return groupController.isLoading.value
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(widget.isUpdate ? "Add Member" : "Create Group");
+              }),
+            ),
           ),
         ],
       ),

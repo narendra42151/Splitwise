@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:splitwise/Comman/Colors.dart';
 
 import 'package:splitwise/View/Group/GroupDetails.dart';
+import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class AppColors {
@@ -21,11 +22,15 @@ class AppColors {
 }
 
 class SplitExpenseScreen extends StatefulWidget {
+  final String gpId;
   final double amount;
   final String description;
 
   const SplitExpenseScreen(
-      {Key? key, required this.amount, required this.description})
+      {Key? key,
+      required this.amount,
+      required this.description,
+      required this.gpId})
       : super(key: key);
 
   @override
@@ -34,7 +39,7 @@ class SplitExpenseScreen extends StatefulWidget {
 
 class _SplitExpenseScreenState extends State<SplitExpenseScreen>
     with SingleTickerProviderStateMixin {
-  final Groupdetailcontroller controller = Get.find<Groupdetailcontroller>();
+  late final Groupdetailcontroller controller;
   final ThemeController themeController = Get.find<ThemeController>();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -42,6 +47,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
   @override
   void initState() {
     super.initState();
+    controller = Get.put(Groupdetailcontroller(groupId: widget.gpId));
     controller.initializeSplitSelection();
     controller.calculateSplitAmount(widget.amount.toString());
 
@@ -267,7 +273,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
               controller.calculateSplitAmount(totalAmount.toString());
 
               controller.createExpense(
-                groupId: controller.groupId,
+                groupId: widget.gpId,
                 description: widget.description,
                 amount: totalAmount,
                 paidBy: controller.groupDetails.value!.createdBy!.id ?? "",

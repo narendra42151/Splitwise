@@ -191,10 +191,12 @@ class GroupController extends GetxController {
         "Please select at least one contact to create a group.",
         snackPosition: SnackPosition.BOTTOM,
       );
+
       return;
     }
 
     try {
+      isLoading.value = true;
       final response = await _repository.createGroup(
           groupName, selectedContacts, authController.user.value!.userId ?? "");
       if (response != null) {
@@ -212,6 +214,8 @@ class GroupController extends GetxController {
         "Failed to create group: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 

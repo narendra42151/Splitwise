@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'SplitExpenseScreen.dart';
 
 class AmountInputScreen extends StatelessWidget {
+  final String groupId;
+  AmountInputScreen({super.key, required this.groupId});
   final TextEditingController amountController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
@@ -50,6 +52,7 @@ class AmountInputScreen extends StatelessWidget {
 
                   // Navigate to the second screen with entered data
                   Get.to(() => SplitExpenseScreen(
+                        gpId: groupId,
                         amount: amount,
                         description: description,
                       ));

@@ -145,10 +145,16 @@ class ProfileEditScreen extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: controller.isLoading.value
                                   ? null
-                                  : () => controller.updateUserDetails(
+                                  : () {
+                                      controller
+                                          .updateUserDetails(
                                         usernameController.text,
                                         selectedImagePath.value,
-                                      ),
+                                      )
+                                          .then((_) {
+                                        Get.back(); // Navigate back after the password is changed
+                                      });
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 shape: RoundedRectangleBorder(
