@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
-import 'package:splitwise/View/Pay/PayScreen.dart';
+import 'package:splitwise/Models/PayMentModel.dart';
+import 'package:splitwise/View/Pay/PayService.dart';
 
 class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
@@ -19,6 +20,11 @@ class SplitRequestCard extends StatelessWidget {
     final theme = Theme.of(context);
     final expenseDetails = expenseModel.expenseDetails;
     final isDark = theme.brightness == Brightness.dark;
+    final splitAmong = expenseModel.expenseDetails?.splitAmong ?? [];
+    final totalAmount = expenseModel.expenseDetails?.amount ?? 0.0;
+
+    // Calculate split amount considering potential division by zero
+    final splitAmount = totalAmount / (splitAmong.length);
 
     return Card(
       elevation: 8,
@@ -119,7 +125,7 @@ class SplitRequestCard extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Pay Button
-              _buildPayButton(isDark),
+              _buildPayButton(isDark, splitAmount),
             ],
           ),
         ),
@@ -209,12 +215,16 @@ class SplitRequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPayButton(bool isDark) {
+  Widget _buildPayButton(bool isDark, double amount) {
     return ElevatedButton(
       onPressed: () {
-        Get.to(() => Payscreen(
-              expenseModel: expenseModel,
-            ));
+        Get.to(() => PaymentScreen(
+            paymentModel: Paymentmodel(
+                receiverName:
+                    expenseModel.expenseDetails!.paidBy![0].username ?? "",
+                revicerUpiId:
+                    expenseModel.expenseDetails!.paidBy![0].upiId ?? "",
+                amout: double.parse(amount.toStringAsFixed(2)).toString())));
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,

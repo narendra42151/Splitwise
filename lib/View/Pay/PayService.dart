@@ -1,36 +1,91 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:splitwise/Models/PayMentModel.dart';
 import 'package:upi_pay/api.dart';
+import 'package:upi_pay/types/applications.dart';
 import 'package:upi_pay/types/discovery.dart';
 import 'package:upi_pay/types/meta.dart';
+import 'dart:typed_data';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:upi_pay/types/response.dart';
 
-class Screen extends StatefulWidget {
+class PaymentScreen extends StatefulWidget {
+  final Paymentmodel paymentModel;
+  PaymentScreen({required this.paymentModel, super.key});
   @override
-  _ScreenState createState() => _ScreenState();
+  State<StatefulWidget> createState() {
+    return _PaymentScreen();
+  }
 }
 
-class _ScreenState extends State<Screen> {
+class _PaymentScreen extends State<PaymentScreen> {
   String? _upiAddrError;
+  late final TextEditingController _upiAddressController;
+  late final TextEditingController _amountController;
 
-  final _upiAddressController = TextEditingController();
-  final _amountController = TextEditingController();
   final _upiPayPlugin = UpiPay();
-
   bool _isUpiEditable = false;
   List<ApplicationMeta>? _apps;
+
+  // Static method to load icon
+  static Future<Uint8List> _loadIconFromAsset(String assetPath) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    return data.buffer.asUint8List();
+  }
+
+  // Add this method to initialize manual apps asynchronously
+  Future<List<ApplicationMeta>> _initializeManualUpiApps() async {
+    return [
+      ApplicationMeta.android(
+        UpiApplication(
+          appName: 'Super Money',
+          androidPackageName: 'money.super.payments',
+          discoveryCustomScheme: 'supermoney',
+        ),
+        await _loadIconFromAsset('assets/SuperMoney.png'),
+        1, // priority
+        1, // preferredOrder
+      ),
+      ApplicationMeta.android(
+        UpiApplication(
+          appName: 'Navi',
+          androidPackageName: 'com.naviapp',
+          discoveryCustomScheme: 'naviapp',
+        ),
+        await _loadIconFromAsset('assets/navi.png'),
+        1, // priority
+        1, // preferredOrder
+      ),
+    ];
+  }
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    _upiAddressController =
+        TextEditingController(text: widget.paymentModel.revicerUpiId);
+    _amountController = TextEditingController(text: widget.paymentModel.amout);
 
-    _amountController.text =
-        (Random.secure().nextDouble() * 10).toStringAsFixed(2);
-
-    Future.delayed(Duration(milliseconds: 0), () async {
+    Future.delayed(Duration.zero, () async {
       _apps = await _upiPayPlugin.getInstalledUpiApplications(
           statusType: UpiApplicationDiscoveryAppStatusType.all);
+
+      // Initialize manual apps
+      final manualUpiApps = await _initializeManualUpiApps();
+
+      if (_apps != null) {
+        for (var manualApp in manualUpiApps) {
+          if (!_apps!.any((app) =>
+              app.upiApplication.androidPackageName ==
+              manualApp.upiApplication.androidPackageName)) {
+            _apps!.add(manualApp);
+          }
+        }
+      }
+
       setState(() {});
     });
   }
@@ -40,12 +95,6 @@ class _ScreenState extends State<Screen> {
     _amountController.dispose();
     _upiAddressController.dispose();
     super.dispose();
-  }
-
-  void _generateAmount() {
-    setState(() {
-      _amountController.text = '10';
-    });
   }
 
   Future<void> _onTap(ApplicationMeta app) async {
@@ -63,62 +112,140 @@ class _ScreenState extends State<Screen> {
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     print("Starting transaction with id $transactionRef");
 
-    final a = await _upiPayPlugin.initiateTransaction(
+    final UpiTransactionResponse a = await _upiPayPlugin.initiateTransaction(
       amount: _amountController.text,
       app: app.upiApplication,
-      receiverName: 'Sharad',
+      receiverName: widget.paymentModel.receiverName,
       receiverUpiAddress: _upiAddressController.text,
       transactionRef: transactionRef,
       transactionNote: 'UPI Payment',
-      // merchantCode: '7372',
     );
-
-    print(a);
+    handleTransactionResponse(a);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: ListView(
-        children: <Widget>[
-          _vpa(),
-          if (_upiAddrError != null) _vpaError(),
-          _amount(),
-          if (Platform.isIOS) _submitButton(),
-          Platform.isAndroid ? _androidApps() : _iosApps(),
-        ],
+  void handleTransactionResponse(UpiTransactionResponse response) {
+    switch (response.status) {
+      case UpiTransactionStatus.success:
+        onTransactionSuccess(context, response);
+        break;
+      case UpiTransactionStatus.failure:
+        onTransactionFailure(context, response);
+        break;
+      case UpiTransactionStatus.submitted:
+        onTransactionPending(context, response);
+        break;
+      default:
+        onTransactionUnknown(context, response);
+    }
+  }
+
+  void onTransactionSuccess(
+      BuildContext context, UpiTransactionResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Transaction Successful! Transaction ID: ${response.txnId}',
+          style: TextStyle(color: Colors.greenAccent),
+        ),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 5),
       ),
     );
   }
 
-  Widget _vpa() {
+  void onTransactionFailure(
+      BuildContext context, UpiTransactionResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Transaction Failed! Response Code: ${response.responseCode}',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void onTransactionPending(
+      BuildContext context, UpiTransactionResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Transaction Submitted and Pending! Transaction ID: ${response.txnId}',
+          style: TextStyle(color: Colors.orangeAccent),
+        ),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void onTransactionUnknown(
+      BuildContext context, UpiTransactionResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Transaction Status Unknown! Raw Response: ${response.rawResponse}',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.grey,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
+  String? _validateUpiAddress(String value) {
+    if (value.isEmpty) {
+      return 'UPI VPA is required.';
+    }
+    if (value.split('@').length != 2) {
+      return 'Invalid UPI VPA';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('UPI Payment'),
+      ),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: ListView(
+          children: <Widget>[
+            _upiAddressField(),
+            if (_upiAddrError != null) _upiAddrErrorWidget(),
+            _amountField(),
+            if (Platform.isIOS) _submitButton(),
+            Platform.isAndroid ? _androidApps() : _iosApps(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _upiAddressField() {
     return Container(
       margin: EdgeInsets.only(top: 32),
       child: Row(
         children: <Widget>[
           Expanded(
-            child: TextFormField(
-              controller: _upiAddressController,
-              enabled: _isUpiEditable,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'address@upi',
-                labelText: 'Receiving UPI Address',
+            child: Form(
+              key: _formKey,
+              child: TextFormField(
+                controller: _upiAddressController,
+                enabled: _isUpiEditable,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'address@upi',
+                  labelText: 'Receiving UPI Address',
+                ),
+                validator: (value) {
+                  return _validateUpiAddress(value ?? '');
+                },
               ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 8),
-            child: IconButton(
-              icon: Icon(
-                _isUpiEditable ? Icons.check : Icons.edit,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isUpiEditable = !_isUpiEditable;
-                });
-              },
             ),
           ),
         ],
@@ -126,7 +253,7 @@ class _ScreenState extends State<Screen> {
     );
   }
 
-  Widget _vpaError() {
+  Widget _upiAddrErrorWidget() {
     return Container(
       margin: EdgeInsets.only(top: 4, left: 12),
       child: Text(
@@ -136,7 +263,7 @@ class _ScreenState extends State<Screen> {
     );
   }
 
-  Widget _amount() {
+  Widget _amountField() {
     return Container(
       margin: EdgeInsets.only(top: 32),
       child: Row(
@@ -152,13 +279,6 @@ class _ScreenState extends State<Screen> {
               ),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(left: 8),
-            child: IconButton(
-              icon: Icon(Icons.loop),
-              onPressed: _generateAmount,
-            ),
-          ),
         ],
       ),
     );
@@ -171,7 +291,11 @@ class _ScreenState extends State<Screen> {
         children: <Widget>[
           Expanded(
             child: MaterialButton(
-              onPressed: () async => await _onTap(_apps![0]),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  await _onTap(_apps![0]);
+                }
+              },
               child: Text('Initiate Transaction',
                   style: Theme.of(context)
                       .textTheme
@@ -272,13 +396,11 @@ class _ScreenState extends State<Screen> {
       shrinkWrap: true,
       mainAxisSpacing: 4,
       crossAxisSpacing: 4,
-      // childAspectRatio: 1.6,
       physics: NeverScrollableScrollPhysics(),
       children: apps
           .map(
             (it) => Material(
               key: ObjectKey(it.upiApplication),
-              // color: Colors.grey[200],
               child: InkWell(
                 onTap: Platform.isAndroid ? () async => await _onTap(it) : null,
                 child: Column(
@@ -302,14 +424,4 @@ class _ScreenState extends State<Screen> {
           .toList(),
     );
   }
-}
-
-String? _validateUpiAddress(String value) {
-  if (value.isEmpty) {
-    return 'UPI VPA is required.';
-  }
-  if (value.split('@').length != 2) {
-    return 'Invalid UPI VPA';
-  }
-  return null;
 }

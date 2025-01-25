@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:splitwise/Comman/Colors.dart';
-
 import 'package:splitwise/View/Group/GroupDetails.dart';
-import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
 class AppColors {
