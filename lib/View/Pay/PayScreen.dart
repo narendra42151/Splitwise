@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
+import 'package:splitwise/View/Pay/PayService.dart';
 
 class Payscreen extends StatefulWidget {
   final ExpenseModel expenseModel;
@@ -17,9 +20,11 @@ class _Payscreen extends State<Payscreen> {
       body: Column(
         children: [
           Center(
-            child:
-                Text("${widget.expenseModel.expenseDetails!.paidBy![0].upiId}"),
-          )
+              child: IconButton(
+                  onPressed: () {
+                    Get.to(() => Screen());
+                  },
+                  icon: Icon(Icons.payment)))
         ],
       ),
     );

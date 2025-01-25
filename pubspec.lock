@@ -861,6 +861,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  upi_pay:
+    dependency: "direct main"
+    description:
+      name: upi_pay
+      sha256: "08c6a6418a6a71715afa61a75015978c56d8e09ffedfc8313af0b3afdd34b84a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   vector_math:
     dependency: transitive
     description:
