@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
+import 'package:splitwise/View/Pay/PayScreen.dart';
 
 class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
@@ -209,7 +211,11 @@ class SplitRequestCard extends StatelessWidget {
 
   Widget _buildPayButton(bool isDark) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Get.to(() => Payscreen(
+              expenseModel: expenseModel,
+            ));
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
         elevation: 6,
@@ -218,11 +224,11 @@ class SplitRequestCard extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       ),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.payment, color: Colors.white),
-          const SizedBox(width: 8),
+          Icon(Icons.payment, color: Colors.white),
+          SizedBox(width: 8),
           Text(
             "Pay Now",
             style: TextStyle(

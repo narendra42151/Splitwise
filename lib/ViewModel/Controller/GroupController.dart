@@ -111,33 +111,15 @@ class GroupController extends GetxController {
 
         selectedContacts.add(updatedContact);
 
-        // Show success message
-        Get.snackbar(
-          "Contact Added",
-          "${contact.displayName} has been added to the list.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        // Return success status
+        return Future.value("Contact Added: ${contact.displayName}");
       } else {
-        // Show error message
-        Get.snackbar(
-          "Contact Not Found",
-          "${contact.displayName} is not registered.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-          colorText: Colors.white,
-        );
+        // Return error status
+        return Future.error("${contact.displayName} is not registered.");
       }
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar(
-        "Error",
-        error.value,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-        colorText: Colors.white,
-      );
+      return Future.error("Error: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

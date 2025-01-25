@@ -10,6 +10,7 @@ class RegisterScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController upiIdController = TextEditingController();
   final RxString selectedImagePath = ''.obs;
 
   @override
@@ -129,6 +130,25 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    FadeSlideTransition(
+                        delay: 0.4,
+                        child: TextField(
+                          controller:
+                              upiIdController, // Your existing controller
+
+                          decoration: InputDecoration(
+                            labelText: 'UPI ID',
+                            prefixIcon:
+                                const Icon(Icons.account_balance_wallet),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        )),
+
+// Function to validate the UPI ID format
+
+                    const SizedBox(height: 16),
                     // Password Field
                     FadeSlideTransition(
                       delay: 0.8,
@@ -182,11 +202,11 @@ class RegisterScreen extends StatelessWidget {
                               onPressed: controller.isLoading.value
                                   ? null
                                   : () => controller.register(
-                                        usernameController.text,
-                                        "fdsf",
-                                        phoneController.text,
-                                        passwordController.text,
-                                      ),
+                                      usernameController.text,
+                                      "fdsf",
+                                      phoneController.text,
+                                      passwordController.text,
+                                      upiIdController.text),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 shape: RoundedRectangleBorder(

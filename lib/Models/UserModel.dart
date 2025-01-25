@@ -4,6 +4,7 @@ class UserModel {
   String? profilePicture;
   String? phoneNumber;
   List<String>? joinedGroups;
+  String? upiId;
   String? createdAt;
   String? updatedAt;
 
@@ -13,6 +14,7 @@ class UserModel {
     this.profilePicture,
     this.phoneNumber,
     this.joinedGroups,
+    this.upiId,
     this.createdAt,
     this.updatedAt,
   });
@@ -22,9 +24,11 @@ class UserModel {
     username = json['username'];
     profilePicture = json['profilePicture'];
     phoneNumber = json['phoneNumber'];
+
     joinedGroups = json['joinedGroups'] != null
         ? List<String>.from(json['joinedGroups'])
         : null; // Ensure joinedGroups can be null
+    upiId = json['upiId'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
@@ -36,6 +40,7 @@ class UserModel {
     data['profilePicture'] = this.profilePicture;
     data['phoneNumber'] = this.phoneNumber;
     data['joinedGroups'] = this.joinedGroups; // Can be null
+    data['upiId'] = this.upiId;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
 

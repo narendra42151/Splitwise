@@ -61,6 +61,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               delegate: ExpenseSearchDelegate(controller),
             ),
           ),
+          SizedBox(
+            width: 10,
+          ),
+          IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () => controller.fetchGroupData(
+                  page: controller.currentPage.value)),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(

@@ -72,6 +72,7 @@ class CreatedBy {
 
 class Members {
   String? groupId;
+  String? upiId;
   String? username;
   String? profilePicture;
   String? phoneNumber;
@@ -80,6 +81,7 @@ class Members {
 
   Members.fromJson(Map<String, dynamic> json) {
     groupId = json['_id'];
+    upiId = json['upiId'];
     username = json['username'];
     profilePicture = json['profilePicture'];
     phoneNumber = json['phoneNumber'];
@@ -88,6 +90,7 @@ class Members {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['_id'] = this.groupId;
+    data['upiId'] = this.upiId;
     data['username'] = this.username;
     data['profilePicture'] = this.profilePicture;
     data['phoneNumber'] = this.phoneNumber;

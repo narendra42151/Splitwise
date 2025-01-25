@@ -12,13 +12,13 @@ class AuthController extends GetxController {
   final RxBool isPasswordVisible = false.obs;
 
   Future<void> register(String username, String profilePicture,
-      String phoneNumber, String password) async {
+      String phoneNumber, String password, String upiId) async {
     try {
       isLoading.value = true;
       error.value = '';
 
       final newUser = await _repository.registerUser(
-          username, profilePicture, phoneNumber, password);
+          username, profilePicture, phoneNumber, password, upiId);
 
       user.value = newUser;
 
@@ -90,7 +90,6 @@ class AuthController extends GetxController {
       final updatedUser =
           await _repository.updateUserDetails(username, profilePicture);
       user.value = updatedUser;
-      await getUserDetails();
       Get.snackbar('Success', 'Profile updated successfully',
           backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
@@ -134,13 +133,10 @@ class AuthController extends GetxController {
 
       // Fetch user details from repository
       final userDetails = await _repository.getUserDetails();
-      print(userDetails.toString());
 
       // Update the user state
       user.value = userDetails;
-      if (user.value == null) {
-        Get.toNamed("/login");
-      }
+
       return user.value;
 
       // You can handle any additional logic here (e.g., navigating to a different screen if needed)

@@ -7,13 +7,14 @@ class AuthRepository {
   final _tokenManager = SecureTokenManager();
 
   Future<UserModel> registerUser(String username, String profilePicture,
-      String phoneNumber, String password) async {
+      String phoneNumber, String password, String upiId) async {
     try {
       final Map<String, dynamic> data = {
         'username': username,
         'profilePicture': profilePicture,
         'phoneNumber': phoneNumber,
-        'password': password
+        'password': password,
+        'upiId': upiId
       };
 
       final response = await _apiServices.postApi(

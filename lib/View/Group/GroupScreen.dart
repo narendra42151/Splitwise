@@ -105,27 +105,55 @@ class _GroupScreenState extends State<GroupScreen> {
                       groupController.selectedContacts.contains(contact);
 
                   return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: contact.profilePicture != null
-                          ? NetworkImage(contact.profilePicture!)
-                          : null,
-                      child: contact.profilePicture == null
-                          ? const Icon(Icons.person)
-                          : null,
-                    ),
-                    title: Text(contact.displayName),
-                    subtitle: Text(contact.phoneNumber),
-                    trailing: Checkbox(
-                      value: isSelected,
-                      onChanged: (value) {
-                        if (value == true) {
-                          groupController.validateContact(contact);
-                        } else {
-                          groupController.selectedContacts.remove(contact);
-                        }
-                      },
-                    ),
-                  );
+                      leading: CircleAvatar(
+                        backgroundImage: contact.profilePicture != null
+                            ? NetworkImage(contact.profilePicture!)
+                            : null,
+                        child: contact.profilePicture == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(contact.displayName),
+                      subtitle: Text(contact.phoneNumber),
+                      trailing: Checkbox(
+                        value: isSelected,
+                        onChanged: (value) async {
+                          if (value == true) {
+                            try {
+                              final message = await groupController
+                                  .validateContact(contact);
+                              // Show success message
+                              Get.snackbar(
+                                "Success",
+                                "Added Contact",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.green,
+                                colorText: Colors.white,
+                              );
+                            } catch (error) {
+                              // Show error message
+                              Get.snackbar(
+                                "Error",
+                                error.toString(),
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor:
+                                    const Color.fromARGB(255, 106, 106, 108),
+                                colorText: Colors.white,
+                              );
+                            }
+                          } else {
+                            groupController.selectedContacts.remove(contact);
+                            // Show a message if desired
+                            Get.snackbar(
+                              "Contact Removed",
+                              "${contact.displayName} has been removed from the list.",
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                      ));
                 },
               );
             }),
