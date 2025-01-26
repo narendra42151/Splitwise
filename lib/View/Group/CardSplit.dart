@@ -222,7 +222,7 @@ class SplitRequestCard extends StatelessWidget {
       onPressed: () {
         Get.to(() => PaymentScreen(
             paymentModel: Paymentmodel(
-                expenseId: expenseModel.expenseId ?? "",
+                expenseId: expenseModel.expenseDetails!.expenseId ?? "",
                 groupId: groupId,
                 receiverName:
                     expenseModel.expenseDetails!.paidBy![0].username ?? "",

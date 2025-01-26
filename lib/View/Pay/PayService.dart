@@ -69,6 +69,7 @@ class _PaymentScreen extends State<PaymentScreen> {
   void initState() {
     super.initState();
     controller = Get.put(Paymentcontroller());
+    fetchBalance();
 
     _upiAddressController =
         TextEditingController(text: widget.paymentModel.revicerUpiId);
@@ -125,27 +126,27 @@ class _PaymentScreen extends State<PaymentScreen> {
 
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     print("Starting transaction with id $transactionRef");
-    bool isId = await fetchBalance();
-    if (isId) {
-      final UpiTransactionResponse a = await _upiPayPlugin.initiateTransaction(
-        amount: _amountController.text,
-        app: app.upiApplication,
-        receiverName: widget.paymentModel.receiverName,
-        receiverUpiAddress: _upiAddressController.text,
-        transactionRef: transactionRef,
-        transactionNote: 'UPI Payment',
-      );
-      handleTransactionResponse(a);
-    } else {
-      const SnackBar(
-        content: Text(
-          'Balance Id Not Found',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 5),
-      );
-    }
+    // bool isId = await fetchBalance();
+    // if (isId) {
+    final UpiTransactionResponse a = await _upiPayPlugin.initiateTransaction(
+      amount: _amountController.text,
+      app: app.upiApplication,
+      receiverName: widget.paymentModel.receiverName,
+      receiverUpiAddress: _upiAddressController.text,
+      transactionRef: transactionRef,
+      transactionNote: 'UPI Payment',
+    );
+    handleTransactionResponse(a);
+    // } else {
+    //   const SnackBar(
+    //     content: Text(
+    //       'Balance Id Not Found',
+    //       style: TextStyle(color: Colors.white),
+    //     ),
+    //     backgroundColor: Colors.red,
+    //     duration: Duration(seconds: 5),
+    //   );
+    // }
   }
 
   void handleTransactionResponse(UpiTransactionResponse response) {
