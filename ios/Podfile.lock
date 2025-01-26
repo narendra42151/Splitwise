@@ -38,8 +38,6 @@ PODS:
     - Flutter
   - flutter_secure_storage (6.0.0):
     - Flutter
-  - flutter_upi_india (1.0.0):
-    - Flutter
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
@@ -50,10 +48,6 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
-  - razorpay-pod (1.3.14)
-  - razorpay_flutter (1.1.10):
-    - Flutter
-    - razorpay-pod
   - SDWebImage (5.19.7):
     - SDWebImage/Core (= 5.19.7)
   - SDWebImage/Core (5.19.7)
@@ -62,25 +56,25 @@ PODS:
     - FlutterMacOS
   - SwiftyGif (5.4.5)
   - Toast (4.1.1)
+  - upi_pay (1.0.0):
+    - Flutter
 
 DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_contacts (from `.symlinks/plugins/flutter_contacts/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
-  - flutter_upi_india (from `.symlinks/plugins/flutter_upi_india/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - razorpay_flutter (from `.symlinks/plugins/razorpay_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - upi_pay (from `.symlinks/plugins/upi_pay/ios`)
 
 SPEC REPOS:
   trunk:
     - DKImagePickerController
     - DKPhotoGallery
-    - razorpay-pod
     - SDWebImage
     - SwiftyGif
     - Toast
@@ -94,8 +88,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_contacts/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
-  flutter_upi_india:
-    :path: ".symlinks/plugins/flutter_upi_india/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker_ios:
@@ -104,10 +96,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  razorpay_flutter:
-    :path: ".symlinks/plugins/razorpay_flutter/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  upi_pay:
+    :path: ".symlinks/plugins/upi_pay/ios"
 
 SPEC CHECKSUMS:
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
@@ -116,17 +108,15 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_contacts: edb1c5ce76aa433e20e6cb14c615f4c0b66e0983
   flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
-  flutter_upi_india: c4fa4c0783b172550a9f0a5b6d39091271a678e0
   fluttertoast: e9a18c7be5413da53898f660530c56f35edfba9c
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
-  razorpay-pod: ffee2198928e2a5ed2556863af4db6b79722cea3
-  razorpay_flutter: 84b3bfd206ae9c9c2a9ba585524a1b3d8102b6c1
   SDWebImage: 8a6b7b160b4d710e2a22b6900e25301075c34cb3
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
+  upi_pay: a7d6fab40381ea9b2f9f8d56da43829926ce1ff0
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 

@@ -93,18 +93,18 @@ packages:
     dependency: transitive
     description:
       name: decimal
-      sha256: da8f65df568345f2738cc8b0de74971c86d2d93ce5fc8c4ec094f6b7c5d48eb5
+      sha256: "28239b8b929c1bd8618702e6dbc96e2618cf99770bbe9cb040d6cf56a11e4ec3"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.2.1"
   devtools_shared:
     dependency: "direct main"
     description:
       name: devtools_shared
-      sha256: b9151dce6d092be745b1035e9b1915b9790e12af7a5d9b4f64bb660010de3a40
+      sha256: fa71f07006dfdf3f226ec76db95a4bad156820c081452cc99d18a4f291001bee
       url: "https://pub.dev"
     source: hosted
-    version: "11.0.0"
+    version: "11.2.0"
   dtd:
     dependency: transitive
     description:
@@ -121,14 +121,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
-  eventify:
-    dependency: transitive
-    description:
-      name: eventify
-      sha256: b829429f08586cc2001c628e7499e3e3c2493a1d895fd73b00ecb23351aa5a66
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   extension_discovery:
     dependency: transitive
     description:
@@ -299,14 +291,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_upi_india:
-    dependency: "direct main"
-    description:
-      name: flutter_upi_india
-      sha256: d0686c9f510df959924140817f31727d58440d7b052d212b3f757b771b3b3fe8
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.6"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -356,18 +340,18 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: b9c29a161230ee03d3ccf545097fccd9b87a5264228c5d348202e0f0c28f9010
+      sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.2"
+    version: "1.3.0"
   http_parser:
     dependency: transitive
     description:
       name: http_parser
-      sha256: "2aa08ce0341cc9b354a498388e30986515406668dbcc4f7c950c3e715496693b"
+      sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.2"
+    version: "4.1.2"
   image_picker:
     dependency: "direct main"
     description:
@@ -412,10 +396,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_macos
-      sha256: "3f5ad1e8112a9a6111c46d0b57a7be2286a9a07fc6e1976fdf5be2bd31d4ff62"
+      sha256: "1b90ebbd9dcf98fb6c1d01427e49a55bd96b5d67b8c67cf955d60a5de74207c1"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1+1"
+    version: "0.2.1+2"
   image_picker_platform_interface:
     dependency: transitive
     description:
@@ -436,10 +420,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "00f33b908655e606b86d2ade4710a231b802eec6f11e87e4ea3783fd72077a50"
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.20.1"
+    version: "0.20.2"
   js:
     dependency: transitive
     description:
@@ -688,30 +672,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.3"
-  razorpay_flutter:
-    dependency: "direct main"
-    description:
-      name: razorpay_flutter
-      sha256: "5ae44cdea5312f8ef830ec04e31f9bdeeb83522ef1f314a25c463dd934c37cad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.7"
   shared_preferences:
     dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: a752ce92ea7540fc35a0d19722816e04d0e72828a4200e83a98cf1a1eb524c9a
+      sha256: c59819dacc6669a1165d54d2735a9543f136f9b3cec94ca65cea6ab8dffc422e
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.5"
+    version: "2.4.0"
   shared_preferences_android:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: "138b7bbbc7f59c56236e426c37afb8f78cbc57b094ac64c440e0bb90e380a4f5"
+      sha256: "986dc7b7d14f38064bfa85ace28df1f1a66d4fba32e4b1079d4ea537d9541b01"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.2"
+    version: "2.4.3"
   shared_preferences_foundation:
     dependency: transitive
     description:
@@ -756,10 +732,10 @@ packages:
     dependency: transitive
     description:
       name: shelf
-      sha256: ad29c505aee705f41a4d8963641f91ac4cee3c8fad5947e033390a7bd8180fa4
+      sha256: e7dd780a7ffb623c57850b33f43309312fc863fb6aa3d276a754bb299839ef12
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.1"
+    version: "1.4.2"
   simple_gesture_detector:
     dependency: transitive
     description:
@@ -905,10 +881,10 @@ packages:
     dependency: "direct main"
     description:
       name: web_socket_channel
-      sha256: "9f187088ed104edd8662ca07af4b124465893caf063ba29758f97af57e61da8f"
+      sha256: "0b8e2457400d8a859b7b2030786835a28a8e80836ef64402abef392ff4f1d0e5"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.2"
   webkit_inspection_protocol:
     dependency: transitive
     description:

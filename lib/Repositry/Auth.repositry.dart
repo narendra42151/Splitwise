@@ -16,11 +16,13 @@ class AuthRepository {
         'password': password,
         'upiId': upiId
       };
+      print("hellio");
 
       final response = await _apiServices.postApi(
         data,
         '/register',
       );
+      print(response.toString());
 
       return UserModel.fromJson(response['data']);
     } catch (e) {

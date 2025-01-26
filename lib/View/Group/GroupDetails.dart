@@ -124,6 +124,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                           expenseModel: expense,
                         ));
                   },
+                  groupId: widget.groupId,
                   expenseModel: expense,
                 );
               },

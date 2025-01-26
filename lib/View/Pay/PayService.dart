@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:splitwise/Models/PayMentModel.dart';
+import 'package:splitwise/ViewModel/Controller/PaymentController.dart';
 import 'package:upi_pay/api.dart';
 import 'package:upi_pay/types/applications.dart';
 import 'package:upi_pay/types/discovery.dart';
@@ -61,10 +63,13 @@ class _PaymentScreen extends State<PaymentScreen> {
   }
 
   final _formKey = GlobalKey<FormState>();
+  late final Paymentcontroller controller;
 
   @override
   void initState() {
     super.initState();
+    controller = Get.put(Paymentcontroller());
+
     _upiAddressController =
         TextEditingController(text: widget.paymentModel.revicerUpiId);
     _amountController = TextEditingController(text: widget.paymentModel.amout);
@@ -90,6 +95,15 @@ class _PaymentScreen extends State<PaymentScreen> {
     });
   }
 
+  Future<bool> fetchBalance() async {
+    String groupId = widget.paymentModel.groupId;
+    String expenseId = widget.paymentModel.expenseId;
+
+    // Call the controller's function to fetch balance details
+    bool isId = await controller.fetchBalanceId(groupId, expenseId);
+    return isId;
+  }
+
   @override
   void dispose() {
     _amountController.dispose();
@@ -111,16 +125,27 @@ class _PaymentScreen extends State<PaymentScreen> {
 
     final transactionRef = Random.secure().nextInt(1 << 32).toString();
     print("Starting transaction with id $transactionRef");
-
-    final UpiTransactionResponse a = await _upiPayPlugin.initiateTransaction(
-      amount: _amountController.text,
-      app: app.upiApplication,
-      receiverName: widget.paymentModel.receiverName,
-      receiverUpiAddress: _upiAddressController.text,
-      transactionRef: transactionRef,
-      transactionNote: 'UPI Payment',
-    );
-    handleTransactionResponse(a);
+    bool isId = await fetchBalance();
+    if (isId) {
+      final UpiTransactionResponse a = await _upiPayPlugin.initiateTransaction(
+        amount: _amountController.text,
+        app: app.upiApplication,
+        receiverName: widget.paymentModel.receiverName,
+        receiverUpiAddress: _upiAddressController.text,
+        transactionRef: transactionRef,
+        transactionNote: 'UPI Payment',
+      );
+      handleTransactionResponse(a);
+    } else {
+      const SnackBar(
+        content: Text(
+          'Balance Id Not Found',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+      );
+    }
   }
 
   void handleTransactionResponse(UpiTransactionResponse response) {
@@ -141,14 +166,15 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   void onTransactionSuccess(
       BuildContext context, UpiTransactionResponse response) {
+    controller.updateBalance(true, false); // add balance ID
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           'Transaction Successful! Transaction ID: ${response.txnId}',
-          style: TextStyle(color: Colors.greenAccent),
+          style: const TextStyle(color: Colors.greenAccent),
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       ),
     );
   }
@@ -159,10 +185,10 @@ class _PaymentScreen extends State<PaymentScreen> {
       SnackBar(
         content: Text(
           'Transaction Failed! Response Code: ${response.responseCode}',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       ),
     );
   }
@@ -173,10 +199,10 @@ class _PaymentScreen extends State<PaymentScreen> {
       SnackBar(
         content: Text(
           'Transaction Submitted and Pending! Transaction ID: ${response.txnId}',
-          style: TextStyle(color: Colors.orangeAccent),
+          style: const TextStyle(color: Colors.orangeAccent),
         ),
         backgroundColor: Colors.orange,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       ),
     );
   }
@@ -187,10 +213,10 @@ class _PaymentScreen extends State<PaymentScreen> {
       SnackBar(
         content: Text(
           'Transaction Status Unknown! Raw Response: ${response.rawResponse}',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.grey,
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
       ),
     );
   }
@@ -209,10 +235,10 @@ class _PaymentScreen extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('UPI Payment'),
+        title: const Text('UPI Payment'),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView(
           children: <Widget>[
             _upiAddressField(),
@@ -228,7 +254,7 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   Widget _upiAddressField() {
     return Container(
-      margin: EdgeInsets.only(top: 32),
+      margin: const EdgeInsets.only(top: 32),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -237,7 +263,7 @@ class _PaymentScreen extends State<PaymentScreen> {
               child: TextFormField(
                 controller: _upiAddressController,
                 enabled: _isUpiEditable,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'address@upi',
                   labelText: 'Receiving UPI Address',
@@ -255,17 +281,17 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   Widget _upiAddrErrorWidget() {
     return Container(
-      margin: EdgeInsets.only(top: 4, left: 12),
+      margin: const EdgeInsets.only(top: 4, left: 12),
       child: Text(
         _upiAddrError!,
-        style: TextStyle(color: Colors.red),
+        style: const TextStyle(color: Colors.red),
       ),
     );
   }
 
   Widget _amountField() {
     return Container(
-      margin: EdgeInsets.only(top: 32),
+      margin: const EdgeInsets.only(top: 32),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -273,7 +299,7 @@ class _PaymentScreen extends State<PaymentScreen> {
               controller: _amountController,
               readOnly: true,
               enabled: false,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Amount',
               ),
@@ -286,7 +312,7 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   Widget _submitButton() {
     return Container(
-      margin: EdgeInsets.only(top: 32),
+      margin: const EdgeInsets.only(top: 32),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -314,12 +340,12 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   Widget _androidApps() {
     return Container(
-      margin: EdgeInsets.only(top: 32, bottom: 32),
+      margin: const EdgeInsets.only(top: 32, bottom: 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 12),
             child: Text(
               'Pay Using',
               style: Theme.of(context).textTheme.bodyMedium,
@@ -333,12 +359,12 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   Widget _iosApps() {
     return Container(
-      margin: EdgeInsets.only(top: 32, bottom: 32),
+      margin: const EdgeInsets.only(top: 32, bottom: 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(bottom: 24),
+            margin: const EdgeInsets.only(bottom: 24),
             child: Text(
               'One of these will be invoked automatically by your phone to '
               'make a payment',
@@ -346,7 +372,7 @@ class _PaymentScreen extends State<PaymentScreen> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 12),
             child: Text(
               'Detected Installed Apps',
               style: Theme.of(context).textTheme.bodyMedium,
@@ -354,7 +380,7 @@ class _PaymentScreen extends State<PaymentScreen> {
           ),
           if (_apps != null) _discoverableAppsGrid(),
           Container(
-            margin: EdgeInsets.only(top: 12, bottom: 12),
+            margin: const EdgeInsets.only(top: 12, bottom: 12),
             child: Text(
               'Other Supported Apps (Cannot detect)',
               style: Theme.of(context).textTheme.bodyMedium,
@@ -396,7 +422,7 @@ class _PaymentScreen extends State<PaymentScreen> {
       shrinkWrap: true,
       mainAxisSpacing: 4,
       crossAxisSpacing: 4,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       children: apps
           .map(
             (it) => Material(
@@ -409,7 +435,7 @@ class _PaymentScreen extends State<PaymentScreen> {
                   children: <Widget>[
                     it.iconImage(48),
                     Container(
-                      margin: EdgeInsets.only(top: 4),
+                      margin: const EdgeInsets.only(top: 4),
                       alignment: Alignment.center,
                       child: Text(
                         it.upiApplication.getAppName(),

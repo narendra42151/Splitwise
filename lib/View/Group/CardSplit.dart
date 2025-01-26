@@ -7,9 +7,11 @@ import 'package:splitwise/View/Pay/PayService.dart';
 
 class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
+  final String groupId;
   final VoidCallback onTap;
 
   const SplitRequestCard({
+    required this.groupId,
     required this.expenseModel,
     required this.onTap,
     Key? key,
@@ -220,6 +222,8 @@ class SplitRequestCard extends StatelessWidget {
       onPressed: () {
         Get.to(() => PaymentScreen(
             paymentModel: Paymentmodel(
+                expenseId: expenseModel.expenseId ?? "",
+                groupId: groupId,
                 receiverName:
                     expenseModel.expenseDetails!.paidBy![0].username ?? "",
                 revicerUpiId:
