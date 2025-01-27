@@ -162,7 +162,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
         child: Column(
           children: [
             Text(
-              '\$${widget.amount.toStringAsFixed(2)}',
+              '\₹${widget.amount.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -220,7 +220,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
                     ),
                   ),
                   subtitle: Text(
-                    "\$${controller.splitAmounts[index].toStringAsFixed(2)}",
+                    "\₹${controller.splitAmounts[index].toStringAsFixed(2)}",
                     style: TextStyle(
                       color: isDark
                           ? AppColors.darkPrimaryColor
