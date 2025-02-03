@@ -10,9 +10,14 @@ import 'package:splitwise/View/User/LoginScreen.dart';
 import 'package:splitwise/View/User/ProfileEditScreen.dart';
 import 'package:splitwise/View/User/RegisterScreen.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp());
 }

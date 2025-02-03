@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
 import 'package:splitwise/Models/GetMessage.dart';
 import 'package:splitwise/Models/GroupModel.dart';
+import 'package:splitwise/Utils/Utils.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
 import 'package:splitwise/View/Group/CardSplit.dart';
 import 'package:splitwise/View/Group/PaymentDetailScreen.dart';
@@ -66,7 +67,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     userId = controller.authController.user.value!.userId ?? "";
     print("User ID: $userId");
 
-    socket = IO.io("http://10.0.2.2:3001", <String, dynamic>{
+    socket = IO.io("${SOCKETPROD}", <String, dynamic>{
       "transports": ['websocket'],
       "autoConnect": false,
     });
