@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
+import 'package:splitwise/Models/GetMessage.dart';
 import 'package:splitwise/Models/GroupModel.dart';
 import 'package:splitwise/Repositry/Group.repositry.dart';
+import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
+import 'package:splitwise/ViewModel/Controller/Undefined.dart';
 
 class Groupdetailcontroller extends GetxController {
   final GroupRepository _repository = GroupRepository();
@@ -14,16 +18,23 @@ class Groupdetailcontroller extends GetxController {
   var query = "".obs;
   final selectedMembers = <bool>[].obs;
   final splitAmounts = <double>[].obs;
+  var error = ''.obs;
+  var message = ''.obs;
+  var messageList = <MessageGet>[].obs;
+  var mergedList = <UnifiedItem>[].obs;
 
+  var isMessageActive = false.obs;
   String groupId;
   final int limit;
 
   Groupdetailcontroller({required this.groupId, this.limit = 5});
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   void onInit() {
     super.onInit();
     fetchGroupData();
+    fetchMessage(groupId);
     ever(groupDetails, (_) => initializeSplitSelection());
   }
 
@@ -58,6 +69,7 @@ class Groupdetailcontroller extends GetxController {
               .map<ExpenseModel>((json) => ExpenseModel.fromJson(json))
               .toList());
         }
+        mergeAndSortItems();
       } else {
         throw Exception(response['message'] ?? 'Unknown error occurred');
       }
@@ -136,6 +148,28 @@ class Groupdetailcontroller extends GetxController {
     return userIds;
   }
 
+  Future<void> fetchMessage(String groupId) async {
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      final fetchedMessages = await _repository.getMessage(groupId);
+
+      // Convert fetchedMessages to List<MessageGet> if needed
+      messageList.assignAll(
+        fetchedMessages.map((msg) => MessageGet.fromJson(msg)).toList(),
+      );
+      mergeAndSortItems();
+    } catch (e) {
+      error.value = e.toString();
+      Get.snackbar('Error', 'Failed to fetch messages',
+          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
+          colorText: Colors.white);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> createExpense({
     required String groupId,
     required String description,
@@ -168,5 +202,39 @@ class Groupdetailcontroller extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  void mergeAndSortItems() {
+    final List<UnifiedItem> unifiedItems = [];
+
+    // Add expenses to the unified list
+    for (var expense in expenses) {
+      if (expense.expenseDetails?.createdAt != null) {
+        unifiedItems.add(
+          UnifiedItem(
+            createdAt: DateTime.parse(expense.expenseDetails!.createdAt!),
+            item: expense,
+          ),
+        );
+      }
+    }
+
+    // Add messages to the unified list
+    for (var message in messageList) {
+      if (message.createdAt != null) {
+        unifiedItems.add(
+          UnifiedItem(
+            createdAt: DateTime.parse(message.createdAt!),
+            item: message,
+          ),
+        );
+      }
+    }
+
+    // Sort the unified list by createdAt in ascending order (newest at the bottom)
+    unifiedItems.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    // Update the mergedList observable
+    mergedList.assignAll(unifiedItems);
   }
 }

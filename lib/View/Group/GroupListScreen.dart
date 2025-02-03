@@ -5,13 +5,22 @@ import 'package:splitwise/View/Group/GroupDetails.dart';
 import 'package:splitwise/View/Group/GroupScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
-class GroupListScreen extends StatelessWidget {
+class GroupListScreen extends StatefulWidget {
+  @override
+  State<GroupListScreen> createState() => _GroupListScreenState();
+}
+
+class _GroupListScreenState extends State<GroupListScreen> {
   final GroupController groupController = Get.put(GroupController());
+  @override
+  void initState() {
+    groupController.fetchUserGroups();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Fetch groups when the screen loads
-    groupController.fetchUserGroups();
 
     return Scaffold(
       appBar: AppBar(

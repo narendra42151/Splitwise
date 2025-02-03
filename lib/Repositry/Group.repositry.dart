@@ -157,6 +157,41 @@ class GroupRepository {
     }
   }
 
+  Future<List<dynamic>> getMessage(String groupId) async {
+    try {
+      final accessToken = await _tokenManager.getAccessToken();
+
+      final Map<String, String> headers = {
+        'authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await _apiServices.getApiWithHeaders(
+          '/get-message/$groupId', headers);
+
+      if (response == null || response.isEmpty) {
+        throw Exception('Empty response from server');
+      }
+
+      final Map<String, dynamic> jsonResponse =
+          response as Map<String, dynamic>;
+
+      if (!jsonResponse.containsKey('data')) {
+        throw Exception('Invalid response format: Missing "data" field');
+      }
+
+      final List<dynamic> messages = jsonResponse['data'];
+
+      if (messages.isEmpty) {
+        throw Exception('No messages found');
+      }
+
+      return messages;
+    } catch (e) {
+      throw Exception('Failed to fetch messages: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> createExpense({
     required String groupId,
     required String description,
