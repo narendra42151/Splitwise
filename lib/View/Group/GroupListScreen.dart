@@ -12,37 +12,41 @@ class GroupListScreen extends StatefulWidget {
 
 class _GroupListScreenState extends State<GroupListScreen> {
   final GroupController groupController = Get.put(GroupController());
+
   @override
   void initState() {
-    groupController.fetchUserGroups();
     super.initState();
+    Future.delayed(Duration.zero, () {
+      groupController.fetchUserGroups(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Fetch groups when the screen loads
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Groups"),
         leading: IconButton(
-            onPressed: () {
-              Get.toNamed("/home");
-            },
-            icon: Icon(Icons.arrow_back)),
+          onPressed: () {
+            if (!Get.isDialogOpen! && !Get.isBottomSheetOpen!) {
+              Get.offNamed("/home"); // Safely navigating
+            }
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
         actions: [
           IconButton(
-              onPressed: () {
-                Get.to(() => GroupScreen(
-                      isUpdate: false,
-                    ));
-              },
-              icon: Icon(Icons.add))
+            onPressed: () {
+              Future.delayed(Duration.zero, () {
+                Get.to(() => GroupScreen(isUpdate: false));
+              });
+            },
+            icon: Icon(Icons.add),
+          )
         ],
       ),
       body: Column(
         children: [
-          // Search bar
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -56,45 +60,37 @@ class _GroupListScreenState extends State<GroupListScreen> {
               ),
             ),
           ),
-
-          // Group list
           Expanded(
             child: Obx(() {
-              // Show loading spinner
               if (groupController.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
-
-              // Show message if no groups found
               if (groupController.filteredGroups.isEmpty) {
                 return const Center(child: Text("No groups found."));
               }
-
-              // Display group list
               return ListView.builder(
                 itemCount: groupController.filteredGroups.length,
                 itemBuilder: (context, index) {
                   final group = groupController.filteredGroups[index];
                   return ListTile(
-                    leading: CircleAvatar(
-                      // backgroundImage: group.members!.isNotEmpty &&
-                      //         group.members!.first.profilePicture != null
-                      //     ? NetworkImage(group.members!.first.profilePicture!)
-                      //     : null,
-                      child: const Icon(Icons.group),
-                    ),
+                    leading: CircleAvatar(child: const Icon(Icons.group)),
                     title: Text(group.name ?? "Unnamed Group"),
                     subtitle: Text(
-                        "Created by: ${group.createdBy!.username ?? 'Unknown'}"),
+                        "Created by: ${group.createdBy?.username ?? 'Unknown'}"),
                     trailing: IconButton(
-                        onPressed: () {
+                      onPressed: () {
+                        Future.delayed(Duration.zero, () {
                           Get.to(() => TestScreen(group: group));
-                        },
-                        icon: Icon(Icons.edit)),
+                        });
+                      },
+                      icon: Icon(Icons.edit),
+                    ),
                     onTap: () {
-                      Get.to(() => GroupDetailsScreen(
-                            groupId: group.groupId ?? "",
-                          ));
+                      Future.delayed(Duration.zero, () {
+                        Get.to(() => GroupDetailsScreen(
+                              groupId: group.groupId ?? "",
+                            ));
+                      });
                     },
                   );
                 },

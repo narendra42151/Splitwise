@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Repositry/PaymentRepositry.dart';
+import 'package:splitwise/Utils/CustomException.dart';
+import 'package:splitwise/Utils/Errorhandler.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
+import 'package:splitwise/data/AppException.dart';
 
 class Paymentcontroller extends GetxController {
   final Paymentrepositry _repository = Paymentrepositry();
@@ -8,7 +12,8 @@ class Paymentcontroller extends GetxController {
   final RxString error = ''.obs;
   final RxString balanceId = "".obs;
 
-  Future<bool> fetchBalanceId(String groupId, String expenseId) async {
+  Future<dynamic> fetchBalanceId(
+      String groupId, String expenseId, BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -23,14 +28,24 @@ class Paymentcontroller extends GetxController {
       return true;
     } catch (e) {
       error.value = e.toString();
-      return false;
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
-      return false;
     }
   }
 
-  Future<void> updateBalance(bool paid, bool markAsPaid) async {
+  Future<void> updateBalance(
+      bool paid, bool markAsPaid, BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -40,25 +55,21 @@ class Paymentcontroller extends GetxController {
       await _repository.balanceUpdate(balanceId.value, paid, markAsPaid);
 
       // Show success message
-      Get.snackbar(
-        "Success",
-        "Balance updated successfully",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+
+      showCustomSnackBar(context, "Balance updated successfully");
     } catch (e) {
       error.value = e.toString();
-      print(error.value);
 
-      // Show error message
-      Get.snackbar(
-        "Error",
-        error.value,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }

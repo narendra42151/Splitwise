@@ -4,7 +4,8 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 
 class ServerDownScreen extends StatelessWidget {
-  const ServerDownScreen({Key? key}) : super(key: key);
+  final bool server;
+  const ServerDownScreen({required this.server, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,9 @@ class ServerDownScreen extends StatelessWidget {
               ),
               SizedBox(height: 24),
               Text(
-                'Server Unavailable',
+                server
+                    ? 'Server Unavailable'
+                    : "WE'RE UNABLE TO LOAD PAGE DATA",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -34,7 +37,9 @@ class ServerDownScreen extends StatelessWidget {
               ),
               SizedBox(height: 16),
               Text(
-                'It looks like the server is currently down. Please check your connection or try again later.',
+                server
+                    ? 'It looks like the server is currently down. Please check your connection or try again later.'
+                    : 'Please check your internet connection or try again later',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
@@ -44,7 +49,7 @@ class ServerDownScreen extends StatelessWidget {
               SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  Get.to(() => SplashScreen());
+                  Get.toNamed("/home");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,

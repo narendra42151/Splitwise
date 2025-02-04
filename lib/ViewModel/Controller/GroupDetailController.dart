@@ -4,8 +4,11 @@ import 'package:splitwise/Models/ExpenseModel.dart';
 import 'package:splitwise/Models/GetMessage.dart';
 import 'package:splitwise/Models/GroupModel.dart';
 import 'package:splitwise/Repositry/Group.repositry.dart';
+import 'package:splitwise/Utils/CustomException.dart';
+import 'package:splitwise/Utils/Errorhandler.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
 import 'package:splitwise/ViewModel/Controller/Undefined.dart';
+import 'package:splitwise/data/AppException.dart';
 
 class Groupdetailcontroller extends GetxController {
   final GroupRepository _repository = GroupRepository();
@@ -170,15 +173,15 @@ class Groupdetailcontroller extends GetxController {
     }
   }
 
-  Future<void> createExpense({
-    required String groupId,
-    required String description,
-    required double amount,
-    required String paidBy,
-    required List<String> splitAmong,
-    required String splitType,
-    required Map<String, double> manualSplit,
-  }) async {
+  Future<void> createExpense(
+      {required String groupId,
+      required String description,
+      required double amount,
+      required String paidBy,
+      required List<String> splitAmong,
+      required String splitType,
+      required Map<String, double> manualSplit,
+      required BuildContext context}) async {
     try {
       isLoading(true);
       // print(splitAmong.toString());
@@ -197,10 +200,20 @@ class Groupdetailcontroller extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
       }
     } catch (e) {
-      Get.snackbar("Error", "Failed to create expense: ${e.toString()}",
-          snackPosition: SnackPosition.BOTTOM);
+      error.value = e.toString();
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
-      isLoading(false);
+      isLoading.value = false;
     }
   }
 

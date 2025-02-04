@@ -110,6 +110,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             // Directly call the controller method to change the password
                             authController
                                 .changePassword(
+                              context: context,
                               oldPassword: currentPasswordController.text,
                               newPassword: newPasswordController.text,
                             )
@@ -125,8 +126,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color:
-                                  Colors.white, // Matches the button text color
+                              color: Color.fromARGB(255, 14, 13,
+                                  13), // Matches the button text color
                             ),
                           )
                         : const Text("Change Password"),

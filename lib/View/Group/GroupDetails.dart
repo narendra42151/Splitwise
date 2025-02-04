@@ -167,8 +167,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           ),
           IconButton(
               icon: Icon(Icons.refresh),
-              onPressed: () => controller.fetchGroupData(
-                  page: controller.currentPage.value)),
+              onPressed: () {
+                controller.fetchGroupData(page: controller.currentPage.value);
+                controller.fetchMessage(widget.groupId);
+              }),
         ],
       ),
       floatingActionButton: controller.isMessageActive.value

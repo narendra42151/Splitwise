@@ -122,8 +122,8 @@ class _TestScreenState extends State<TestScreen> {
                 onPressed: isLoading
                     ? null // Disable button when loading
                     : () async {
-                        await controller.updateGroup(
-                            nameController.text, widget.group.groupId ?? "");
+                        await controller.updateGroup(nameController.text,
+                            widget.group.groupId ?? "", context);
                         Get.toNamed("/home");
                       },
                 child: isLoading

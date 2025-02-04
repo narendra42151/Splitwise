@@ -101,7 +101,7 @@ class _PaymentScreen extends State<PaymentScreen> {
     String expenseId = widget.paymentModel.expenseId;
 
     // Call the controller's function to fetch balance details
-    bool isId = await controller.fetchBalanceId(groupId, expenseId);
+    bool isId = await controller.fetchBalanceId(groupId, expenseId, context);
     return isId;
   }
 
@@ -167,7 +167,7 @@ class _PaymentScreen extends State<PaymentScreen> {
 
   void onTransactionSuccess(
       BuildContext context, UpiTransactionResponse response) {
-    controller.updateBalance(true, false); // add balance ID
+    controller.updateBalance(true, false, context); // add balance ID
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(

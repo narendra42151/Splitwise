@@ -148,9 +148,9 @@ class ProfileEditScreen extends StatelessWidget {
                                   : () {
                                       controller
                                           .updateUserDetails(
-                                        usernameController.text,
-                                        selectedImagePath.value,
-                                      )
+                                              usernameController.text,
+                                              selectedImagePath.value,
+                                              context)
                                           .then((_) {
                                         Get.back(); // Navigate back after the password is changed
                                       });

@@ -2,9 +2,12 @@ class AppException implements Exception {
   final _message;
   final _prefix;
   AppException([this._message, this._prefix]);
+  Type getType() {
+    return runtimeType;
+  }
 
   String toString() {
-    return "$_prefix$_message";
+    return "$_prefix $_message";
   }
 }
 

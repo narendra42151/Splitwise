@@ -1,5 +1,6 @@
 import 'package:splitwise/Models/UserModel.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
+import 'package:splitwise/data/AppException.dart';
 import 'package:splitwise/data/Network/network_api.dart';
 
 class AuthRepository {
@@ -26,7 +27,11 @@ class AuthRepository {
 
       return UserModel.fromJson(response['data']);
     } catch (e) {
-      throw Exception('Registration failed: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Registration failed: $e');
+      }
     }
   }
 
@@ -92,7 +97,11 @@ class AuthRepository {
       final response = await _apiServices.putApi(data, '/user/update');
       return UserModel.fromJson(response['user']);
     } catch (e) {
-      throw Exception('Update failed: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Update failed: $e');
+      }
     }
   }
 
@@ -110,7 +119,11 @@ class AuthRepository {
 
       await _apiServices.postApiWithHeaders(data, '/change-password', headers);
     } catch (e) {
-      throw Exception('Password change failed: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Password change failed: $e'); // Wrap others
+      }
     }
   }
 
@@ -140,7 +153,11 @@ class AuthRepository {
 
       return UserModel.fromJson(user);
     } catch (e) {
-      throw Exception('Failed to fetch user details: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to fetch user details: $e');
+      }
     }
   }
 }

@@ -493,7 +493,8 @@ class RegisterScreen extends StatelessWidget {
                                       "fdsf",
                                       phoneController.text,
                                       passwordController.text,
-                                      upiIdController.text),
+                                      upiIdController.text,
+                                      context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 shape: RoundedRectangleBorder(

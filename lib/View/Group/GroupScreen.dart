@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
 
 import 'package:splitwise/ViewModel/Controller/GroupController.dart';
 
@@ -121,36 +122,21 @@ class _GroupScreenState extends State<GroupScreen> {
                           if (value == true) {
                             try {
                               final message = await groupController
-                                  .validateContact(contact);
+                                  .validateContact(contact, context);
                               // Show success message
-                              Get.snackbar(
-                                "Success",
-                                "Added Contact",
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white,
-                              );
+
+                              showCustomSnackBar(context, "Added Contact");
                             } catch (error) {
                               // Show error message
-                              Get.snackbar(
-                                "Error",
-                                error.toString(),
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor:
-                                    const Color.fromARGB(255, 106, 106, 108),
-                                colorText: Colors.white,
-                              );
+
+                              showCustomSnackBar(context, error.toString());
                             }
                           } else {
                             groupController.selectedContacts.remove(contact);
                             // Show a message if desired
-                            Get.snackbar(
-                              "Contact Removed",
-                              "${contact.displayName} has been removed from the list.",
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
+
+                            showCustomSnackBar(context,
+                                "${contact.displayName} has been removed from the list.");
                           }
                         },
                       ));
@@ -186,7 +172,8 @@ class _GroupScreenState extends State<GroupScreen> {
                   if (widget.isUpdate) {
                     Get.back(); // Close the current screen if updating
                   } else {
-                    await groupController.createGroup(groupName.text.trim());
+                    await groupController.createGroup(
+                        groupName.text.trim(), context);
                     Get.toNamed("/groupScreenList");
                   }
                 }

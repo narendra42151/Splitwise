@@ -1,9 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/CustomContact.dart';
 import 'package:splitwise/Models/GroupModel.dart';
 import 'package:splitwise/Repositry/Group.repositry.dart';
+import 'package:splitwise/Utils/CustomException.dart';
+import 'package:splitwise/Utils/Errorhandler.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
 import 'package:splitwise/ViewModel/Controller/Auth.Controller.dart';
+import 'package:splitwise/data/AppException.dart';
 
 class GroupController extends GetxController {
   RxList<CustomContact> allContacts = <CustomContact>[].obs;
@@ -79,7 +84,8 @@ class GroupController extends GetxController {
     }
   }
 
-  Future<void> validateContact(CustomContact contact) async {
+  Future<void> validateContact(
+      CustomContact contact, BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -118,6 +124,19 @@ class GroupController extends GetxController {
       }
     } catch (e) {
       error.value = e.toString();
+      error.value = e.toString();
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
+
       return Future.error("Error: ${e.toString()}");
     } finally {
       isLoading.value = false;
@@ -128,7 +147,7 @@ class GroupController extends GetxController {
     selectedContacts.clear();
   }
 
-  Future<void> fetchUserGroups() async {
+  Future<void> fetchUserGroups(BuildContext context) async {
     try {
       isLoading.value = true;
 
@@ -143,12 +162,18 @@ class GroupController extends GetxController {
       allGroups.value = groups;
       filteredGroups.value = groups; // Initially, display all groups
     } catch (e) {
-      print(e.toString());
-      Get.snackbar(
-        "Error",
-        "Failed to fetch user groups: $e",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      error.value = e.toString();
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
@@ -165,13 +190,10 @@ class GroupController extends GetxController {
     }
   }
 
-  Future<void> createGroup(String groupName) async {
+  Future<void> createGroup(String groupName, BuildContext context) async {
     if (selectedContacts.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please select at least one contact to create a group.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      showCustomSnackBar(
+          context, "Please select at least one contact to create a group.");
 
       return;
     }
@@ -181,33 +203,34 @@ class GroupController extends GetxController {
       final response = await _repository.createGroup(
           groupName, selectedContacts, authController.user.value!.userId ?? "");
       if (response != null) {
-        Get.snackbar(
-          "Success",
-          "Group created successfully!",
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        await fetchUserGroups();
+        showCustomSnackBar(context, "Group created successfully!");
+        await fetchUserGroups(context);
         clearContacts();
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to create group: ${e.toString()}",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      error.value = e.toString();
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> updateGroup(String groupName, String groupId) async {
+  Future<void> updateGroup(
+      String groupName, String groupId, BuildContext context) async {
     isLoading.value = true;
     if (selectedContacts.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please select at least one contact to create a group.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      showCustomSnackBar(
+          context, "Please select at least one contact to create a group.");
       return;
     }
 
@@ -216,25 +239,26 @@ class GroupController extends GetxController {
       final response = await _repository.updateGroupDetails(
           groupId, groupName, selectedContacts);
       if (response != null) {
-        await fetchUserGroups();
-        Get.snackbar(
-          "Success",
-          "Group Updated successfully!",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        await fetchUserGroups(context);
+
+        showCustomSnackBar(context, "Group Updated successfully!");
       } else {}
       clearContacts();
-      Get.snackbar(
-        "Group",
-        "Group Updated",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+
+      showCustomSnackBar(context, "Group Updated");
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to create group: ${e.toString()}",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      error.value = e.toString();
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }

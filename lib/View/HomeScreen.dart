@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.toNamed("/groupScreenList"), // Correct navigation
+        onPressed: () => Get.offNamed("/groupScreenList"), // Correct navigation
         icon: Icon(Icons.group_add,
             color: Theme.of(context).colorScheme.onPrimary),
         label: Text(

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/CustomContact.dart';
 import 'package:splitwise/Utils/TokenFile.dart';
+import 'package:splitwise/data/AppException.dart';
 
 import 'package:splitwise/data/Network/network_api.dart';
 
@@ -39,7 +40,11 @@ class GroupRepository {
 
       return response['data'];
     } catch (e) {
-      throw Exception('Failed to create group: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to create group: $e');
+      }
     }
   }
 
@@ -57,7 +62,11 @@ class GroupRepository {
           await _apiServices.getApiWithHeaders('/get-group/$groupId', headers);
       return response['data'];
     } catch (e) {
-      throw Exception('Failed to fetch group details: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to fetch group details: $e');
+      }
     }
   }
 
@@ -87,7 +96,11 @@ class GroupRepository {
       print(response.toString());
       return response['data'];
     } catch (e) {
-      throw Exception('Failed to update group details: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to update group details: $e');
+      }
     }
   }
 
@@ -105,7 +118,11 @@ class GroupRepository {
 
       return response['data'];
     } catch (e) {
-      throw Exception('Failed to check contact in database: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to check contact in database: $e');
+      }
     }
   }
 
@@ -123,7 +140,11 @@ class GroupRepository {
 
       return response['data'];
     } catch (e) {
-      throw Exception('Failed to fetch user groups: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to fetch user groups: $e');
+      }
     }
   }
 
@@ -153,7 +174,11 @@ class GroupRepository {
 
       throw Exception('Unexpected response format');
     } catch (e) {
-      throw Exception('Failed to fetch user groups: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to fetch user groups: $e');
+      }
     }
   }
 
@@ -188,7 +213,11 @@ class GroupRepository {
 
       return messages;
     } catch (e) {
-      throw Exception('Failed to fetch messages: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to fetch messages: $e');
+      }
     }
   }
 
@@ -241,7 +270,11 @@ class GroupRepository {
         throw Exception('Unexpected response format: $response');
       }
     } catch (e) {
-      throw Exception('Failed to create expense: $e');
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to create expense: $e');
+      }
     }
   }
 }

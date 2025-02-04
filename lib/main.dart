@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:splitwise/Comman/Colors.dart';
+import 'package:splitwise/Comman/ServerDownScreen.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 import 'package:splitwise/View/User/ChangePasswordScreen.dart';
 import 'package:splitwise/View/Group/GroupListScreen.dart';
@@ -99,6 +100,20 @@ class MyApp extends StatelessWidget {
           GetPage(
             name: '/register',
             page: () => RegisterScreen(),
+            transition: Transition.rightToLeft,
+          ),
+          GetPage(
+            name: '/internet-exception',
+            page: () => ServerDownScreen(
+              server: false,
+            ),
+            transition: Transition.rightToLeft,
+          ),
+          GetPage(
+            name: '/server-exception',
+            page: () => ServerDownScreen(
+              server: true,
+            ),
             transition: Transition.rightToLeft,
           ),
           GetPage(

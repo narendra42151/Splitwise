@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/UserModel.dart';
 import 'package:splitwise/Repositry/Auth.repositry.dart';
+import 'package:splitwise/Utils/CustomException.dart';
+import 'package:splitwise/Utils/Errorhandler.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
+import 'package:splitwise/data/AppException.dart';
 
 class AuthController extends GetxController {
   final AuthRepository _repository = AuthRepository();
@@ -11,8 +15,13 @@ class AuthController extends GetxController {
   final RxString error = ''.obs;
   final RxBool isPasswordVisible = false.obs;
 
-  Future<void> register(String username, String profilePicture,
-      String phoneNumber, String password, String upiId) async {
+  Future<void> register(
+      String username,
+      String profilePicture,
+      String phoneNumber,
+      String password,
+      String upiId,
+      BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -25,23 +34,24 @@ class AuthController extends GetxController {
       Get.toNamed('/login');
     } catch (e) {
       error.value = e.toString();
-      print(error.value);
 
-      // Show error in a Snackbar
-      Get.snackbar(
-        "Error", // Title
-        error.value, // Message
-        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: const Color.fromARGB(
-            255, 211, 119, 248), // Background color of the Snackbar
-        colorText: Colors.white, // Text color
-      );
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> login(String phoneNumber, String password) async {
+  Future<void> login(
+      String phoneNumber, String password, BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -52,16 +62,17 @@ class AuthController extends GetxController {
       Get.offAllNamed('/home');
     } catch (e) {
       error.value = e.toString();
-      print(error.value.toString());
-      // Show error in a Snackbar
-      Get.snackbar(
-        "Error", // Title
-        error.value, // Message
-        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: const Color.fromARGB(
-            255, 211, 119, 248), // Background color of the Snackbar
-        colorText: Colors.white, // Text color
-      );
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
@@ -82,7 +93,8 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> updateUserDetails(String username, String profilePicture) async {
+  Future<void> updateUserDetails(
+      String username, String profilePicture, BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
@@ -90,33 +102,55 @@ class AuthController extends GetxController {
       final updatedUser =
           await _repository.updateUserDetails(username, profilePicture);
       user.value = updatedUser;
-      Get.snackbar('Success', 'Profile updated successfully',
-          backgroundColor: Colors.green, colorText: Colors.white);
+
+      showCustomSnackBar(context, "Profile updated successfully");
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to update profile',
-          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-          colorText: Colors.white);
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> changePassword(
-      {required String oldPassword, required String newPassword}) async {
+      {required String oldPassword,
+      required String newPassword,
+      required BuildContext context}) async {
     try {
       isLoading.value = true;
       error.value = '';
 
       await _repository.changePassword(oldPassword, newPassword);
 
-      Get.snackbar('Success', 'Password changed successfully',
-          backgroundColor: Colors.green, colorText: Colors.white);
+      showCustomSnackBar(context, "Password changed successfully");
+      Get.toNamed("/home");
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Error', e.toString(),
-          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-          colorText: Colors.white);
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      }
+      // Then check for general Exception
+      else if (e is Exception) {
+        print("Generic Exception");
+
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }
@@ -126,33 +160,29 @@ class AuthController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  Future<dynamic> getUserDetails() async {
+  Future<dynamic> getUserDetails(BuildContext context) async {
     try {
       isLoading.value = true;
       error.value = '';
 
-      // Fetch user details from repository
       final userDetails = await _repository.getUserDetails();
 
-      // Update the user state
       user.value = userDetails;
 
       return user.value;
-
-      // You can handle any additional logic here (e.g., navigating to a different screen if needed)
     } catch (e) {
       error.value = e.toString();
-      print(error.value);
-      // Show error in a Snackbar
-      Get.toNamed("/login");
-      Get.snackbar(
-        "Error", // Title
-        error.value, // Message
-        snackPosition: SnackPosition.BOTTOM, // Position of the Snackbar
-        backgroundColor: const Color.fromARGB(
-            255, 211, 119, 248), // Background color of the Snackbar
-        colorText: Colors.white, // Text color
-      );
+
+      if (e is AppException) {
+        print("App Exception: ${e.getType()}");
+        ErrorHandler.handleError(e, context);
+      } else if (e is Exception) {
+        print("Generic Exception");
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        print("Non-Exception error: $e");
+        ErrorHandler.handleError(e, context);
+      }
     } finally {
       isLoading.value = false;
     }

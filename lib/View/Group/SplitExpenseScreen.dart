@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Comman/Colors.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
 import 'package:splitwise/View/Group/GroupDetails.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 
@@ -238,13 +239,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
   void _showSplitSummary() {
     final splits = controller.getSelectedMembersUserIds();
     if (splits.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please select members to split with",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-        colorText: Colors.white,
-      );
+      showCustomSnackBar(context, "Please select members to split with");
       return;
     }
 
@@ -270,6 +265,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
               controller.calculateSplitAmount(totalAmount.toString());
 
               controller.createExpense(
+                context: context,
                 groupId: widget.gpId,
                 description: widget.description,
                 amount: totalAmount,
@@ -279,14 +275,8 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
                 manualSplit: {},
               );
 
-              Get.snackbar(
-                "Success",
-                "Payment split confirmed",
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.green,
-                colorText: Colors.white,
-              );
-              Get.offAll(() => GroupDetailsScreen(groupId: controller.groupId));
+              showCustomSnackBar(context, "Payment split confirmed");
+              Get.to(() => GroupDetailsScreen(groupId: controller.groupId));
             },
             child: const Text("Confirm"),
           ),

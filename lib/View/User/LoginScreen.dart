@@ -169,7 +169,7 @@ class LoginScreen extends StatelessWidget {
                               onPressed: controller.isLoading.value
                                   ? null
                                   : () => controller.login(phoneController.text,
-                                      passwordController.text),
+                                      passwordController.text, context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).primaryColor,
                                 shape: RoundedRectangleBorder(
