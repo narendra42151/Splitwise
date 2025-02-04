@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:splitwise/Comman/SplashScreen.dart';
 
 class ServerDownScreen extends StatelessWidget {
+  final bool isLogin;
+
   final bool server;
-  const ServerDownScreen({required this.server, Key? key}) : super(key: key);
+  const ServerDownScreen(
+      {required this.isLogin, required this.server, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class ServerDownScreen extends StatelessWidget {
               SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  Get.toNamed("/home");
+                  isLogin ? Get.to(() => SplashScreen()) : Get.toNamed("/home");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,

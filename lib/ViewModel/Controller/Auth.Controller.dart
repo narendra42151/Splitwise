@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Comman/ServerDownScreen.dart';
 import 'package:splitwise/Models/UserModel.dart';
 import 'package:splitwise/Repositry/Auth.repositry.dart';
 import 'package:splitwise/Utils/CustomException.dart';
@@ -168,6 +169,13 @@ class AuthController extends GetxController {
       final userDetails = await _repository.getUserDetails();
 
       user.value = userDetails;
+      print(user.value.toString());
+
+      if (user.value == null) {
+        Get.toNamed("/login");
+      } else {
+        Get.offAllNamed('/home');
+      }
 
       return user.value;
     } catch (e) {
@@ -175,7 +183,14 @@ class AuthController extends GetxController {
 
       if (e is AppException) {
         print("App Exception: ${e.getType()}");
-        ErrorHandler.handleError(e, context);
+        print(e.getType().toString());
+        e.getType().toString() == "UnauthorizedException"
+            ? Get.toNamed("/login")
+            : Get.to(() => ServerDownScreen(
+                isLogin: e.getType().toString() == "UnauthorizedException"
+                    ? false
+                    : true,
+                server: true));
       } else if (e is Exception) {
         print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);

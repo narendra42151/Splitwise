@@ -104,14 +104,16 @@ class MyApp extends StatelessWidget {
           ),
           GetPage(
             name: '/internet-exception',
-            page: () => ServerDownScreen(
+            page: () => const ServerDownScreen(
+              isLogin: false,
               server: false,
             ),
             transition: Transition.rightToLeft,
           ),
           GetPage(
             name: '/server-exception',
-            page: () => ServerDownScreen(
+            page: () => const ServerDownScreen(
+              isLogin: false,
               server: true,
             ),
             transition: Transition.rightToLeft,

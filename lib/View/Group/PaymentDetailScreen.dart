@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Comman/Colors.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
 
 class PaymentRequestScreen extends StatelessWidget {
   final ExpenseModel expenseModel;
@@ -209,11 +210,8 @@ class PaymentRequestScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Handle payment confirmation
-          Get.snackbar(
-            'Paid',
-            'Payment request confirmed',
-            snackPosition: SnackPosition.BOTTOM,
-          );
+         
+          showCustomSnackBar(context, 'Payment request confirmed');
         },
         label: Text('Confirm Payment'),
         icon: Icon(Icons.check),

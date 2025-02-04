@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:splitwise/Utils/SnackBar.dart';
 import 'SplitExpenseScreen.dart';
 
 class AmountInputScreen extends StatelessWidget {
@@ -43,10 +44,8 @@ class AmountInputScreen extends StatelessWidget {
                   final description = descriptionController.text;
 
                   if (amount <= 0 || description.isEmpty) {
-                    Get.snackbar(
-                      "Error",
-                      "Please enter a valid amount and description.",
-                    );
+                   
+                    showCustomSnackBar(context,  "Please enter a valid amount and description");
                     return;
                   }
 

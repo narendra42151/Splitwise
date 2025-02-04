@@ -12,6 +12,7 @@ class ErrorHandler {
     if (error is SocketException) {
       Get.offAllNamed('/internet-exception');
     } else if (error is TimeoutException) {
+      Get.off('/server-exception');
     } else if (error is UnauthorizedException) {
       Get.offAllNamed('/login');
     } else if (error is CustomException) {

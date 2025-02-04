@@ -28,15 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
       // If there's an access token, attempt to fetch user details
       try {
         final user = await authController.getUserDetails(context);
-        print(user.toString());
-
-        if (user == null) {
-          Get.toNamed("/login");
-        } // Fetch user details
-        // After fetching user details, navigate to home if successful
-        else {
-          Get.offAllNamed('/home');
-        }
       } catch (error) {
         Get.offAllNamed('/login');
       }
@@ -105,7 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       opacity: value,
                       child: Transform.translate(
                         offset: Offset(0, 20 * (1 - value)),
-                        child: Text(
+                        child: const Text(
                           'PayWise',
                           style: TextStyle(
                             color: Colors.white,
