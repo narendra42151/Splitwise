@@ -26,6 +26,10 @@ class Groupdetailcontroller extends GetxController {
   var messageList = <MessageGet>[].obs;
   var mergedList = <UnifiedItem>[].obs;
   var isSendShow = false.obs;
+  var currentMessagePage = 1.obs;
+  var totalMessagePages = 1.obs;
+  var currentExpensePage = 1.obs;
+  var totalExpensePages = 1.obs;
 
   var isMessageActive = false.obs;
   String groupId;
@@ -41,6 +45,20 @@ class Groupdetailcontroller extends GetxController {
     fetchGroupData();
     fetchMessage(groupId);
     ever(groupDetails, (_) => initializeSplitSelection());
+  }
+
+  Future<void> loadOlderMessages() async {
+    if (currentMessagePage.value < totalMessagePages.value) {
+      currentMessagePage.value++;
+      await fetchMessage(groupId, page: currentMessagePage.value);
+    }
+  }
+
+  Future<void> loadOlderExpenses() async {
+    if (currentExpensePage.value < totalExpensePages.value) {
+      currentExpensePage.value++;
+      await fetchGroupData(page: currentExpensePage.value);
+    }
   }
 
   Future<void> fetchGroupData({int page = 1}) async {
@@ -152,23 +170,46 @@ class Groupdetailcontroller extends GetxController {
     return userIds;
   }
 
-  Future<void> fetchMessage(String groupId) async {
+  Future<void> fetchMessage(String groupId, {int page = 1}) async {
     try {
       isLoading.value = true;
       error.value = '';
 
-      final fetchedMessages = await _repository.getMessage(groupId);
+      final fullResponse = await _repository.getMessage(groupId, page);
 
-      // Convert fetchedMessages to List<MessageGet> if needed
-      messageList.assignAll(
-        fetchedMessages.map((msg) => MessageGet.fromJson(msg)).toList(),
-      );
+      // Validate response structure
+      if (fullResponse['data'] == null ||
+          fullResponse['data']['docs'] == null) {
+        throw AppException('Invalid response format', 'Please try again later');
+      }
+
+      List<dynamic> messages = fullResponse['data']['docs'];
+
+      final totalPagesFromApi = fullResponse['data']['totalPages'] ?? 1;
+
+      // Update pagination state
+      totalMessagePages.value = totalPagesFromApi;
+      currentMessagePage.value = page;
+
+      // Handle message list update
+      if (page == 1) {
+        messageList.value =
+            messages.map((msg) => MessageGet.fromJson(msg)).toList();
+      } else {
+        messageList
+            .addAll(messages.map((msg) => MessageGet.fromJson(msg)).toList());
+      }
+
       mergeAndSortItems();
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to fetch messages',
-          backgroundColor: const Color.fromARGB(255, 106, 106, 108),
-          colorText: Colors.white);
+
+      Get.snackbar(
+        'Error',
+        'Failed to fetch messages',
+        backgroundColor: const Color.fromARGB(255, 106, 106, 108),
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -241,7 +282,8 @@ class Groupdetailcontroller extends GetxController {
     }
 
     // Sort the unified list by createdAt in ascending order (newest at the bottom)
-    unifiedItems.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    unifiedItems
+        .sort((a, b) => a.createdAt.compareTo(b.createdAt)); // Oldest first
 
     // Update the mergedList observable
     mergedList.assignAll(unifiedItems);

@@ -39,10 +39,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
-          controller.currentPage.value < controller.totalPages.value) {
-        controller.currentPage.value++;
-        controller.fetchGroupData(page: controller.currentPage.value);
+          _scrollController.position.minScrollExtent) {
+        // Load older messages and expenses when scrolled to the top
+        controller.loadOlderMessages();
+        controller.loadOlderExpenses();
       }
     });
 
@@ -50,20 +50,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.mergedList.listen((list) {
         if (list.isNotEmpty) {
-          _scrollToBottom();
+          _scrollToBottom(); // Scroll to the bottom after adding a new message
         }
       });
     });
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
   }
 
   void connect(Groupdetailcontroller controller) {
@@ -89,69 +79,87 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
       socket.on("messageEvent", (msg) {
         if (msg is Map<String, dynamic>) {
-          controller.mergedList.add(
-            UnifiedItem(
-              createdAt: DateTime.now(), // Ensure 'createdAt' exists
-              item: MessageGet(
-                  messageId: "",
-                  createdAt: DateTime.now().toString(),
-                  groupId: msg['groupId'],
-                  message: msg["message"],
-                  createdBy: Members(
-                      groupId: msg["createdBy"],
-                      username: controller.groupDetails.value!
-                          .getUserNameById(msg["createdBy"]))),
+          final newMessage = MessageGet(
+            messageId: "",
+            createdAt: DateTime.now().toString(),
+            groupId: msg['groupId'],
+            message: msg["message"],
+            createdBy: Members(
+              groupId: msg["createdBy"],
+              username: controller.groupDetails.value!
+                  .getUserNameById(msg["createdBy"]),
             ),
           );
+
+          // Add the new message to the mergedList
+          controller.mergedList.add(
+            UnifiedItem(
+              createdAt: DateTime.now(),
+              item: newMessage,
+            ),
+          );
+          print("Added to list");
+
           // Scroll to the bottom when a new message is added
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
+            _scrollToBottom();
           });
         }
       });
     });
   }
 
-  void sendMessage(
-      {required List<String> revicerId,
-      required Groupdetailcontroller controller}) {
+  void sendMessage({
+    required List<String> revicerId,
+    required Groupdetailcontroller controller,
+  }) {
     if (messageController.text.trim().isEmpty) return;
 
     socket.emit("messageEvent", {
       "userList": revicerId,
       "message": messageController.text.trim(),
       "createdBy": userId,
-      "groupId": widget.groupId
+      "groupId": widget.groupId,
     });
 
     messageController.clear();
   }
 
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
   void dispose() {
     socket.disconnect();
+    print("Disconnected");
     messageController.dispose();
     messageFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<Groupdetailcontroller>();
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              Get.toNamed('/groupScreenList');
-            },
-            icon: const Icon(Icons.arrow_back)),
+          onPressed: () {
+            socket.disconnect();
+            print("disconnect");
+            Get.toNamed('/groupScreenList');
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text(
           'Group Details',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -164,15 +172,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               delegate: ExpenseSearchDelegate(controller),
             ),
           ),
-          const SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
           IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: () {
-                controller.fetchGroupData(page: controller.currentPage.value);
-                controller.fetchMessage(widget.groupId);
-              }),
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              controller.fetchGroupData(page: controller.currentPage.value);
+              controller.fetchMessage(widget.groupId);
+            },
+          ),
         ],
       ),
       body: Column(
@@ -236,7 +243,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               const Icon(
                 Icons.receipt_long,
                 size: 64,
-                color: AppColors.lightPrimaryColor, // Google Pay blue
+                color: AppColors.lightPrimaryColor,
               ),
               const SizedBox(height: 16),
               Text(
@@ -252,48 +259,37 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         );
       }
 
-      return Stack(
-        children: [
-          ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 80),
-            itemCount: controller.mergedList.length,
-            itemBuilder: (context, index) {
-              final unifiedItem = controller.mergedList[index];
-              if (unifiedItem.item is ExpenseModel) {
-                final expense = unifiedItem.item as ExpenseModel;
-                final isCurrentUserPaid =
-                    expense.expenseDetails!.paidBy![0].groupId ==
-                        controller.authController.user.value!.userId;
-                return Align(
-                  alignment: isCurrentUserPaid
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  child: _buildExpenseCard(expense, controller),
-                );
-              } else if (unifiedItem.item is MessageGet) {
-                final message = unifiedItem.item as MessageGet;
-                final isCurrentUserMessage = message.createdBy!.groupId ==
+      return ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.only(bottom: 80),
+        itemCount: controller.mergedList.length,
+        itemBuilder: (context, index) {
+          final unifiedItem = controller.mergedList[index];
+          if (unifiedItem.item is ExpenseModel) {
+            final expense = unifiedItem.item as ExpenseModel;
+            final isCurrentUserPaid =
+                expense.expenseDetails!.paidBy![0].groupId ==
                     controller.authController.user.value!.userId;
-                return Align(
-                  alignment: isCurrentUserMessage
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  child: _buildMessageBubble(message, isCurrentUserMessage),
-                );
-              } else {
-                return const SizedBox.shrink(); // Handle unexpected types
-              }
-            },
-          ),
-          if (controller.isLoading.value && !controller.mergedList.isEmpty)
-            const Positioned(
-              bottom: 16.0,
-              left: 0,
-              right: 0,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        ],
+            return Align(
+              alignment: isCurrentUserPaid
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: _buildExpenseCard(expense, controller),
+            );
+          } else if (unifiedItem.item is MessageGet) {
+            final message = unifiedItem.item as MessageGet;
+            final isCurrentUserMessage = message.createdBy!.groupId ==
+                controller.authController.user.value!.userId;
+            return Align(
+              alignment: isCurrentUserMessage
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: _buildMessageBubble(message, isCurrentUserMessage),
+            );
+          } else {
+            return const SizedBox.shrink(); // Handle unexpected types
+          }
+        },
       );
     });
   }

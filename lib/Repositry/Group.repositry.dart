@@ -182,7 +182,7 @@ class GroupRepository {
     }
   }
 
-  Future<List<dynamic>> getMessage(String groupId) async {
+  Future<dynamic> getMessage(String groupId, int page) async {
     try {
       final accessToken = await _tokenManager.getAccessToken();
 
@@ -191,27 +191,28 @@ class GroupRepository {
         'Content-Type': 'application/json',
       };
 
+      // Fetch the response
       final response = await _apiServices.getApiWithHeaders(
-          '/get-message/$groupId', headers);
+        '/get-message/$groupId?page=$page&limit=15',
+        headers,
+      );
 
+      // Check if the response is null or empty
       if (response == null || response.isEmpty) {
         throw Exception('Empty response from server');
       }
 
-      final Map<String, dynamic> jsonResponse =
-          response as Map<String, dynamic>;
+      // No need to decode the response if it's already a Map
+      if (response is! Map<String, dynamic>) {
+        throw Exception('Invalid response format: Expected a Map');
+      }
 
-      if (!jsonResponse.containsKey('data')) {
+      // Validate the response structure
+      if (!response.containsKey('data')) {
         throw Exception('Invalid response format: Missing "data" field');
       }
 
-      final List<dynamic> messages = jsonResponse['data'];
-
-      if (messages.isEmpty) {
-        throw Exception('No messages found');
-      }
-
-      return messages;
+      return response;
     } catch (e) {
       if (e is AppException) {
         throw e; // Re-throw AppException
