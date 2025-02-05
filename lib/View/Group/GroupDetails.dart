@@ -97,7 +97,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   createdAt: DateTime.now().toString(),
                   groupId: msg['groupId'],
                   message: msg["message"],
-                  createdBy: Members(groupId: msg["createdBy"])),
+                  createdBy: Members(
+                      groupId: msg["createdBy"],
+                      username: controller.groupDetails.value!
+                          .getUserNameById(msg["createdBy"]))),
             ),
           );
           // Scroll to the bottom when a new message is added

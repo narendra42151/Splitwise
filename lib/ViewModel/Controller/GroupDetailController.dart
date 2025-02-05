@@ -36,6 +36,7 @@ class Groupdetailcontroller extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    mergedList.clear();
     fetchGroupData();
     fetchMessage(groupId);
     ever(groupDetails, (_) => initializeSplitSelection());

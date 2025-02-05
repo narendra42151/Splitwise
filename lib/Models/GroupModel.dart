@@ -49,6 +49,15 @@ class GroupModel {
     data['updatedAt'] = updatedAt;
     return data;
   }
+
+  String? getUserNameById(String userId) {
+    return members
+        ?.firstWhere(
+          (member) => member.groupId == userId,
+          orElse: () => Members(username: "Unknown"),
+        )
+        .username;
+  }
 }
 
 class CreatedBy {
