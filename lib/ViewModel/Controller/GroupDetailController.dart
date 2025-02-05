@@ -25,6 +25,7 @@ class Groupdetailcontroller extends GetxController {
   var message = ''.obs;
   var messageList = <MessageGet>[].obs;
   var mergedList = <UnifiedItem>[].obs;
+  var isSendShow = false.obs;
 
   var isMessageActive = false.obs;
   String groupId;

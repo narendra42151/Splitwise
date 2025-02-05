@@ -7,6 +7,7 @@ import 'package:splitwise/Utils/Utils.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
 import 'package:splitwise/View/Group/CardSplit.dart';
 import 'package:splitwise/View/Group/PaymentDetailScreen.dart';
+import 'package:splitwise/View/Group/SplitExpenseScreen.dart';
 import 'package:splitwise/ViewModel/Controller/GroupDetailController.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:splitwise/ViewModel/Controller/Undefined.dart';
@@ -83,11 +84,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     socket.connect();
 
     socket.onConnect((_) {
-      print("Socket Connected!");
       socket.emit('Id', {'userId': userId, 'groupId': widget.groupId});
 
       socket.on("messageEvent", (msg) {
-        print("Received message from server: $msg");
         if (msg is Map<String, dynamic>) {
           controller.mergedList.add(
             UnifiedItem(
@@ -111,7 +110,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               curve: Curves.easeOut,
             );
           });
-          print("Added to List");
         }
       });
     });
@@ -176,18 +174,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               }),
         ],
       ),
-      floatingActionButton: controller.isMessageActive.value
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: () {
-                Get.to(() => AmountInputScreen(
-                      groupId: widget.groupId,
-                    ));
-              },
-              icon: Icon(Icons.group_add),
-              label: Text('Split Expense'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
       body: Column(
         children: [
           Expanded(
@@ -196,21 +182,41 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           if (controller.isMessageActive.value) _buildMessageInput(controller),
         ],
       ),
-      bottomNavigationBar: controller.isMessageActive.value
-          ? null
-          : BottomAppBar(
-              child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.message),
-                  onPressed: () {
-                    controller.isMessageActive.value = true;
-                    FocusScope.of(context).requestFocus(messageFocusNode);
-                  },
+      floatingActionButton: Obx(() {
+        return controller.isMessageActive.value
+            ? SizedBox.shrink()
+            : Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                width: double.infinity,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: FloatingActionButton(
+                        heroTag: "message_button",
+                        onPressed: () {
+                          controller.isMessageActive.value = true;
+                          FocusScope.of(context).requestFocus(messageFocusNode);
+                        },
+                        child: Icon(Icons.message),
+                        backgroundColor: AppColors.lightPrimaryColor,
+                      ),
+                    ),
+                    FloatingActionButton.extended(
+                      heroTag: "split_button",
+                      onPressed: () {
+                        Get.to(
+                            () => AmountInputScreen(groupId: widget.groupId));
+                      },
+                      icon: Icon(Icons.group_add),
+                      label: Text('Split Expense'),
+                      backgroundColor: AppColors.lightPrimaryColor,
+                    ),
+                  ],
                 ),
-              ],
-            )),
+              );
+      }),
     );
   }
 
@@ -225,18 +231,18 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.receipt_long,
                 size: 64,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                color: AppColors.lightPrimaryColor, // Google Pay blue
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'No expenses or messages yet',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Colors.grey[700],
                 ),
               ),
             ],
@@ -254,18 +260,25 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               final unifiedItem = controller.mergedList[index];
               if (unifiedItem.item is ExpenseModel) {
                 final expense = unifiedItem.item as ExpenseModel;
-                return SplitRequestCard(
-                  onTap: () {
-                    Get.to(() => PaymentRequestScreen(
-                          expenseModel: expense,
-                        ));
-                  },
-                  groupId: widget.groupId,
-                  expenseModel: expense,
+                final isCurrentUserPaid =
+                    expense.expenseDetails!.paidBy![0].groupId ==
+                        controller.authController.user.value!.userId;
+                return Align(
+                  alignment: isCurrentUserPaid
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: _buildExpenseCard(expense, controller),
                 );
               } else if (unifiedItem.item is MessageGet) {
                 final message = unifiedItem.item as MessageGet;
-                return _buildMessageItem(message);
+                final isCurrentUserMessage = message.createdBy!.groupId ==
+                    controller.authController.user.value!.userId;
+                return Align(
+                  alignment: isCurrentUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: _buildMessageBubble(message, isCurrentUserMessage),
+                );
               } else {
                 return SizedBox.shrink(); // Handle unexpected types
               }
@@ -283,13 +296,28 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     });
   }
 
-  Widget _buildMessageItem(MessageGet message) {
+  Widget _buildExpenseCard(
+      ExpenseModel expense, Groupdetailcontroller controller) {
+    return SplitRequestCard(
+      isRight: expense.expenseDetails!.paidBy![0].groupId ==
+          controller.authController.user.value!.userId,
+      onTap: () {
+        Get.to(() => PaymentRequestScreen(
+              expenseModel: expense,
+            ));
+      },
+      groupId: widget.groupId,
+      expenseModel: expense,
+    );
+  }
+
+  Widget _buildMessageBubble(MessageGet message, bool isCurrentUser) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
+        color: isCurrentUser ? AppColors.darkPrimaryColor : Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +326,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             message.message ?? '',
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: isCurrentUser ? Colors.white : Colors.black,
             ),
           ),
           SizedBox(height: 4),
@@ -306,7 +334,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             'Sent by: ${message.createdBy?.username ?? 'Unknown'}',
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: isCurrentUser ? Colors.white70 : Colors.grey[700],
             ),
           ),
         ],
@@ -315,35 +343,54 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   }
 
   Widget _buildMessageInput(Groupdetailcontroller controller) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: messageController,
-              focusNode: messageFocusNode,
-              decoration: InputDecoration(
-                hintText: 'Type a message...',
-                border: InputBorder.none,
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
+    return Obx(() {
+      if (!controller.isMessageActive.value) {
+        return SizedBox.shrink(); // Hide the input field if not active
+      }
+
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1,
             ),
           ),
-          if (messageController.text.isNotEmpty)
+        ),
+        child: Row(
+          children: [
             IconButton(
-                icon: Icon(Icons.send),
+              onPressed: () {
+                print("Back button pressed. Setting isMessageActive to false.");
+                controller.isMessageActive.value = false;
+                print("isMessageActive: ${controller.isMessageActive.value}");
+              },
+              icon: Icon(
+                Icons.arrow_left,
+                color: Colors.blueGrey,
+              ),
+            ),
+            Expanded(
+              child: TextField(
+                controller: messageController,
+                focusNode: messageFocusNode,
+                decoration: InputDecoration(
+                  hintText: 'Type a message...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  if (value == "" || value == null) {
+                  } else {
+                    controller.isSendShow.value = true;
+                  }
+                },
+              ),
+            ),
+            if (controller.isSendShow.value)
+              IconButton(
+                icon: Icon(Icons.send, color: AppColors.darkPrimaryColor),
                 onPressed: () {
                   List<String> memberIds = controller
                           .groupDetails.value?.members
@@ -353,10 +400,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                       [];
                   print(memberIds);
                   sendMessage(revicerId: memberIds, controller: controller);
-                }),
-        ],
-      ),
-    );
+                },
+              ),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -404,7 +453,7 @@ class ExpenseSearchDelegate extends SearchDelegate {
               Icon(
                 Icons.search_off,
                 size: 64,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                color: Colors.blue.withOpacity(0.5),
               ),
               SizedBox(height: 16),
               Text(
@@ -428,10 +477,10 @@ class ExpenseSearchDelegate extends SearchDelegate {
             child: ListTile(
               contentPadding: EdgeInsets.all(16),
               leading: CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: AppColors.darkPrimaryColor,
                 child: Icon(
                   Icons.receipt,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Colors.white,
                 ),
               ),
               title: Text(
@@ -439,9 +488,9 @@ class ExpenseSearchDelegate extends SearchDelegate {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                'Amount: ${expense.expenseDetails!.amount ?? 'N/A'}',
+                'Amount: ₹${expense.expenseDetails!.amount ?? 'N/A'}',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: AppColors.darkPrimaryColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),

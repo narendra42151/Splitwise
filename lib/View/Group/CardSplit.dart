@@ -1,3 +1,272 @@
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:intl/intl.dart';
+// import 'package:splitwise/Models/ExpenseModel.dart';
+// import 'package:splitwise/Models/PayMentModel.dart';
+// import 'package:splitwise/View/Pay/PayService.dart';
+
+// class SplitRequestCar extends StatelessWidget {
+//   final ExpenseModel expenseModel;
+//   final String groupId;
+//   final VoidCallback onTap;
+
+//   const SplitRequestCard({
+//     required this.groupId,
+//     required this.expenseModel,
+//     required this.onTap,
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     final expenseDetails = expenseModel.expenseDetails;
+//     final isDark = theme.brightness == Brightness.dark;
+//     final splitAmong = expenseModel.expenseDetails?.splitAmong ?? [];
+//     final totalAmount = expenseModel.expenseDetails?.amount ?? 0.0;
+
+//     // Calculate split amount considering potential division by zero
+//     final splitAmount = totalAmount / (splitAmong.length);
+
+//     return Card(
+//       elevation: 8,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(16),
+//       ),
+//       color: isDark ? Colors.grey[800] : Colors.white,
+//       child: Container(
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(16),
+//           gradient: LinearGradient(
+//             colors: isDark
+//                 ? [Colors.grey[900]!, Colors.grey[800]!]
+//                 : [Colors.white, Colors.grey[100]!],
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//           ),
+//         ),
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               // Header Section
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text(
+//                     "Split Request",
+//                     style: TextStyle(
+//                       color: isDark ? Colors.white : Colors.black87,
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                   Icon(
+//                     Icons.more_vert,
+//                     color: isDark ? Colors.white70 : Colors.black54,
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 12),
+
+//               // Amount Section
+//               Text(
+//                 "₹${expenseDetails!.amount}",
+//                 style: TextStyle(
+//                   color: isDark ? Colors.white : Colors.black,
+//                   fontSize: 32,
+//                   fontWeight: FontWeight.bold,
+//                   letterSpacing: 1.2,
+//                 ),
+//               ),
+//               const SizedBox(height: 16),
+
+//               // User & Progress Section
+//               Row(
+//                 children: [
+//                   // Stacked Avatars
+//                   _buildStackedAvatars(),
+//                   const SizedBox(width: 16),
+
+//                   // Progress Indicator
+//                   Expanded(
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         ClipRRect(
+//                           borderRadius: BorderRadius.circular(10),
+//                           child: LinearProgressIndicator(
+//                             value:
+//                                 (expenseModel.expenseDetails!.paidBy!.length) /
+//                                     (expenseModel
+//                                         .expenseDetails!.splitAmong!.length),
+//                             backgroundColor:
+//                                 isDark ? Colors.grey[700] : Colors.grey[300],
+//                             color: Colors.blue,
+//                             minHeight: 8,
+//                           ),
+//                         ),
+//                         const SizedBox(height: 8),
+//                         Text(
+//                           "${expenseDetails.paidBy!.length}/${expenseDetails.splitAmong!.length} Paid",
+//                           style: TextStyle(
+//                             color: isDark ? Colors.white70 : Colors.black54,
+//                             fontSize: 12,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 16),
+
+//               // Details Section
+//               _buildDetailsRow(isDark, expenseDetails),
+//               const SizedBox(height: 16),
+
+//               // Pay Button
+//               _buildPayButton(isDark, splitAmount),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildStackedAvatars() {
+//     return Stack(
+//       children: [
+//         CircleAvatar(
+//           radius: 20,
+//           backgroundColor: Colors.purple.shade200,
+//           child: const CircleAvatar(
+//             radius: 18,
+//             backgroundImage: AssetImage('assets/me.png'),
+//           ),
+//         ),
+//         Positioned(
+//           left: 24,
+//           child: CircleAvatar(
+//             radius: 20,
+//             backgroundColor: Colors.green.shade200,
+//             child: const CircleAvatar(
+//               radius: 18,
+//               backgroundImage: AssetImage('assets/me.png'),
+//             ),
+//           ),
+//         ),
+//         Positioned(
+//           left: 48,
+//           child: CircleAvatar(
+//             radius: 20,
+//             backgroundColor: Colors.blue.shade200,
+//             child: const CircleAvatar(
+//               radius: 18,
+//               backgroundImage: AssetImage('assets/me.png'),
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+
+//   Widget _buildDetailsRow(bool isDark, dynamic expenseDetails) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//       children: [
+//         Column(
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           children: [
+//             Row(
+//               children: [
+//                 Icon(
+//                   Icons.access_time,
+//                   color: isDark ? Colors.white54 : Colors.black54,
+//                   size: 16,
+//                 ),
+//                 const SizedBox(width: 8),
+//                 Text(
+//                   "Pending · ${_formatTime(expenseDetails.createdAt ?? "")}",
+//                   style: TextStyle(
+//                     color: isDark ? Colors.white54 : Colors.black54,
+//                     fontSize: 12,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             Text("${expenseDetails.description}",
+//                 style: TextStyle(
+//                   color: isDark ? Colors.white54 : Colors.black54,
+//                   fontSize: 12,
+//                 )),
+//           ],
+//         ),
+//         IconButton(
+//           onPressed: () {
+//             onTap();
+//           },
+//           icon: Icon(
+//             Icons.arrow_forward_ios,
+//             color: isDark ? Colors.white54 : Colors.black54,
+//             size: 16,
+//           ),
+//         )
+//       ],
+//     );
+//   }
+
+//   Widget _buildPayButton(bool isDark, double amount) {
+//     return ElevatedButton(
+//       onPressed: () {
+//         Get.to(() => PaymentScreen(
+//             paymentModel: Paymentmodel(
+//                 expenseId: expenseModel.expenseDetails!.expenseId ?? "",
+//                 groupId: groupId,
+//                 receiverName:
+//                     expenseModel.expenseDetails!.paidBy![0].username ?? "",
+//                 revicerUpiId:
+//                     expenseModel.expenseDetails!.paidBy![0].upiId ?? "",
+//                 amout: double.parse(amount.toStringAsFixed(2)).toString())));
+//       },
+//       style: ElevatedButton.styleFrom(
+//         backgroundColor: Colors.blue,
+//         elevation: 6,
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+//       ),
+//       child: const Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Icon(Icons.payment, color: Colors.white),
+//           SizedBox(width: 8),
+//           Text(
+//             "Pay Now",
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 16,
+//               fontWeight: FontWeight.bold,
+//               letterSpacing: 1.1,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// // Existing time formatting function
+// String _formatTime(String createdAt) {
+//   try {
+//     DateTime parsedDate = DateTime.parse(createdAt);
+//     return DateFormat('hh:mm a').format(parsedDate);
+//   } catch (e) {
+//     return createdAt;
+//   }
+// }
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,11 +278,13 @@ class SplitRequestCard extends StatelessWidget {
   final ExpenseModel expenseModel;
   final String groupId;
   final VoidCallback onTap;
+  final bool isRight;
 
   const SplitRequestCard({
     required this.groupId,
     required this.expenseModel,
     required this.onTap,
+    required this.isRight,
     Key? key,
   }) : super(key: key);
 
@@ -28,107 +299,124 @@ class SplitRequestCard extends StatelessWidget {
     // Calculate split amount considering potential division by zero
     final splitAmount = totalAmount / (splitAmong.length);
 
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      color: isDark ? Colors.grey[800] : Colors.white,
-      child: Container(
-        decoration: BoxDecoration(
+    return Padding(
+      padding: EdgeInsets.only(left: isRight ? 32.0 : 0.0),
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: isDark
-                ? [Colors.grey[900]!, Colors.grey[800]!]
-                : [Colors.white, Colors.grey[100]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Split Request",
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+        color: isDark ? Colors.grey[800] : Colors.white,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [Colors.grey[900]!, Colors.grey[800]!]
+                  : [Colors.white, Colors.grey[100]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment:
+                  isRight ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (!isRight)
+                      Text(
+                        "Split Request",
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    Icon(
+                      Icons.more_vert,
+                      color: isDark ? Colors.white70 : Colors.black54,
                     ),
-                  ),
-                  Icon(
-                    Icons.more_vert,
-                    color: isDark ? Colors.white70 : Colors.black54,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Amount Section
-              Text(
-                "₹${expenseDetails!.amount}",
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+                    if (isRight)
+                      Text(
+                        "Split Request",
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
-              // User & Progress Section
-              Row(
-                children: [
-                  // Stacked Avatars
-                  _buildStackedAvatars(),
-                  const SizedBox(width: 16),
-
-                  // Progress Indicator
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value:
-                                (expenseModel.expenseDetails!.paidBy!.length) /
-                                    (expenseModel
-                                        .expenseDetails!.splitAmong!.length),
-                            backgroundColor:
-                                isDark ? Colors.grey[700] : Colors.grey[300],
-                            color: Colors.blue,
-                            minHeight: 8,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "${expenseDetails.paidBy!.length}/${expenseDetails.splitAmong!.length} Paid",
-                          style: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black54,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
+                // Amount Section
+                Text(
+                  "₹${expenseDetails!.amount}",
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 16),
 
-              // Details Section
-              _buildDetailsRow(isDark, expenseDetails),
-              const SizedBox(height: 16),
+                // User & Progress Section
+                Row(
+                  children: [
+                    if (!isRight) _buildStackedAvatars(),
+                    if (!isRight) const SizedBox(width: 16),
 
-              // Pay Button
-              _buildPayButton(isDark, splitAmount),
-            ],
+                    // Progress Indicator
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: isRight
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              value: (expenseModel
+                                      .expenseDetails!.paidBy!.length) /
+                                  (expenseModel
+                                      .expenseDetails!.splitAmong!.length),
+                              backgroundColor:
+                                  isDark ? Colors.grey[700] : Colors.grey[300],
+                              color: Colors.blue,
+                              minHeight: 8,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${expenseDetails.paidBy!.length}/${expenseDetails.splitAmong!.length} Paid",
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isRight) const SizedBox(width: 16),
+                    if (isRight) _buildStackedAvatars(),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Details Section
+                _buildDetailsRow(isDark, expenseDetails, isRight),
+                const SizedBox(height: 16),
+
+                // Pay Button
+                _buildPayButton(isDark, splitAmount, isRight),
+              ],
+            ),
           ),
         ),
       ),
@@ -172,37 +460,39 @@ class SplitRequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsRow(bool isDark, dynamic expenseDetails) {
+  Widget _buildDetailsRow(bool isDark, dynamic expenseDetails, bool isRight) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          isRight ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time,
-                  color: isDark ? Colors.white54 : Colors.black54,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  "Pending · ${_formatTime(expenseDetails.createdAt ?? "")}",
+        if (!isRight)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Pending · ${_formatTime(expenseDetails.createdAt ?? "")}",
+                    style: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              Text("${expenseDetails.description}",
                   style: TextStyle(
                     color: isDark ? Colors.white54 : Colors.black54,
                     fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            Text("${expenseDetails.description}",
-                style: TextStyle(
-                  color: isDark ? Colors.white54 : Colors.black54,
-                  fontSize: 12,
-                )),
-          ],
-        ),
+                  )),
+            ],
+          ),
         IconButton(
           onPressed: () {
             onTap();
@@ -212,12 +502,40 @@ class SplitRequestCard extends StatelessWidget {
             color: isDark ? Colors.white54 : Colors.black54,
             size: 16,
           ),
-        )
+        ),
+        if (isRight)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Pending · ${_formatTime(expenseDetails.createdAt ?? "")}",
+                    style: TextStyle(
+                      color: isDark ? Colors.white54 : Colors.black54,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              Text("${expenseDetails.description}",
+                  style: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black54,
+                    fontSize: 12,
+                  )),
+            ],
+          ),
       ],
     );
   }
 
-  Widget _buildPayButton(bool isDark, double amount) {
+  Widget _buildPayButton(bool isDark, double amount, bool isRight) {
     return ElevatedButton(
       onPressed: () {
         Get.to(() => PaymentScreen(
