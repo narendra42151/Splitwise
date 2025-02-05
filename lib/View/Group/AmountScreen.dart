@@ -13,7 +13,7 @@ class AmountInputScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Enter Expense Details"),
+        title: const Text("Enter Expense Details"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -23,20 +23,20 @@ class AmountInputScreen extends StatelessWidget {
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Enter Amount",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: descriptionController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Enter Description",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -44,8 +44,8 @@ class AmountInputScreen extends StatelessWidget {
                   final description = descriptionController.text;
 
                   if (amount <= 0 || description.isEmpty) {
-                   
-                    showCustomSnackBar(context,  "Please enter a valid amount and description");
+                    showCustomSnackBar(
+                        context, "Please enter a valid amount and description");
                     return;
                   }
 
@@ -56,7 +56,7 @@ class AmountInputScreen extends StatelessWidget {
                         description: description,
                       ));
                 },
-                child: Text("Next"),
+                child: const Text("Next"),
               ),
             ),
           ],

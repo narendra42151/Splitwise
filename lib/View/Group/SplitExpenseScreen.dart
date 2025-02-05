@@ -77,7 +77,7 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
           : AppColors.lightBackgroundColor,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final group = controller.groupDetails.value;
@@ -246,11 +246,11 @@ class _SplitExpenseScreenState extends State<SplitExpenseScreen>
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.green),
-            const SizedBox(width: 8),
-            const Text("Split Summary"),
+            SizedBox(width: 8),
+            Text("Split Summary"),
           ],
         ),
         actions: [

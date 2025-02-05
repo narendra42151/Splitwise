@@ -79,7 +79,6 @@ class Groupdetailcontroller extends GetxController {
         throw Exception(response['message'] ?? 'Unknown error occurred');
       }
     } catch (e) {
-      print(e.toString());
       Get.snackbar("Error", e.toString());
     } finally {
       isLoading(false);
@@ -187,7 +186,7 @@ class Groupdetailcontroller extends GetxController {
     try {
       isLoading(true);
       // print(splitAmong.toString());
-      final response = await _repository.createExpense(
+      await _repository.createExpense(
         groupId: groupId,
         description: description,
         amount: amount,
@@ -197,21 +196,16 @@ class Groupdetailcontroller extends GetxController {
         manualSplit: manualSplit,
       );
 
-      if (response != null) {
-        Get.snackbar("Success", "Expense created successfully!",
-            snackPosition: SnackPosition.BOTTOM);
-      }
+      Get.snackbar("Success", "Expense created successfully!",
+          snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {

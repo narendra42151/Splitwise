@@ -21,44 +21,45 @@ class ServerDownScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.cloud_off,
                 size: 100,
                 color: Colors.redAccent,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Text(
                 server
                     ? 'Server Unavailable'
                     : "WE'RE UNABLE TO LOAD PAGE DATA",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 server
                     ? 'It looks like the server is currently down. Please check your connection or try again later.'
                     : 'Please check your internet connection or try again later',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
                   isLogin ? Get.to(() => SplashScreen()) : Get.toNamed("/home");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
-                child: Text(
+                child: const Text(
                   'Retry',
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),

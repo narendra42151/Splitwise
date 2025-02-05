@@ -10,7 +10,7 @@ class FadeSlideTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       curve: Curves.easeOut,
       builder: (BuildContext context, double value, Widget? child) {
         return Opacity(

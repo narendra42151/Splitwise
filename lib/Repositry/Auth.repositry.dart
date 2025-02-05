@@ -17,7 +17,6 @@ class AuthRepository {
         'password': password,
         'upiId': upiId
       };
-      print("hellio");
 
       final response = await _apiServices.postApi(
         data,

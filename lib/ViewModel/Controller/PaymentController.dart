@@ -17,12 +17,11 @@ class Paymentcontroller extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-      print("hello Id");
 
       final id = await _repository.getBalanceId(groupId, expenseId);
-      print(id.toLowerCase().toString());
+
       balanceId.value = id;
-      if (id == "" || id == null) {
+      if (id == "") {
         return false;
       }
       return true;
@@ -30,13 +29,10 @@ class Paymentcontroller extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -49,8 +45,6 @@ class Paymentcontroller extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-      print("Balance ID");
-      print(balanceId.value);
 
       await _repository.balanceUpdate(balanceId.value, paid, markAsPaid);
 
@@ -61,13 +55,10 @@ class Paymentcontroller extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {

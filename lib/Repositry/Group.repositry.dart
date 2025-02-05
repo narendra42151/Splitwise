@@ -93,7 +93,7 @@ class GroupRepository {
 
       final response = await _apiServices.postApiWithHeaders(
           data, '/update-group/${groupId}', headers);
-      print(response.toString());
+
       return response['data'];
     } catch (e) {
       if (e is AppException) {
@@ -257,9 +257,6 @@ class GroupRepository {
         '/create-expence', // Ensure the endpoint spelling is correct
         headers,
       );
-
-      // Debug Response
-      print("API Response: $response");
 
       // Parse response
       if (response is String) {

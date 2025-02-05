@@ -127,13 +127,10 @@ class GroupController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
 
@@ -165,13 +162,10 @@ class GroupController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -211,13 +205,10 @@ class GroupController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -250,13 +241,10 @@ class GroupController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {

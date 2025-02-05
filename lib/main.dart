@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData.light().copyWith(
           primaryColor: AppColors.lightPrimaryColor,
           scaffoldBackgroundColor: AppColors.lightBackgroundColor,
-          colorScheme: ColorScheme.light(
+          colorScheme: const ColorScheme.light(
             primary: AppColors.lightPrimaryColor,
             secondary: AppColors.lightSecondaryColor,
           ),
@@ -53,14 +53,14 @@ class MyApp extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.lightPrimaryColor),
+              borderSide: const BorderSide(color: AppColors.lightPrimaryColor),
             ),
           ),
         ),
         darkTheme: ThemeData.dark().copyWith(
           primaryColor: AppColors.darkPrimaryColor,
           scaffoldBackgroundColor: AppColors.darkBackgroundColor,
-          colorScheme: ColorScheme.dark(
+          colorScheme: const ColorScheme.dark(
             primary: AppColors.darkPrimaryColor,
             secondary: AppColors.darkSecondaryColor,
           ),
@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.darkPrimaryColor),
+              borderSide: const BorderSide(color: AppColors.darkPrimaryColor),
             ),
           ),
         ),
@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
             themeController.isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
         initialRoute: '/splash',
         defaultTransition: Transition.fadeIn,
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 300),
         getPages: [
           GetPage(
             name: '/splash',

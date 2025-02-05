@@ -32,7 +32,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
               Get.offNamed("/home"); // Safely navigating
             }
           },
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
         actions: [
           IconButton(
@@ -41,7 +41,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
                 Get.to(() => GroupScreen(isUpdate: false));
               });
             },
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
           )
         ],
       ),
@@ -73,7 +73,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
                 itemBuilder: (context, index) {
                   final group = groupController.filteredGroups[index];
                   return ListTile(
-                    leading: CircleAvatar(child: const Icon(Icons.group)),
+                    leading: const CircleAvatar(child: Icon(Icons.group)),
                     title: Text(group.name ?? "Unnamed Group"),
                     subtitle: Text(
                         "Created by: ${group.createdBy?.username ?? 'Unknown'}"),
@@ -83,7 +83,7 @@ class _GroupListScreenState extends State<GroupListScreen> {
                           Get.to(() => TestScreen(group: group));
                         });
                       },
-                      icon: Icon(Icons.edit),
+                      icon: const Icon(Icons.edit),
                     ),
                     onTap: () {
                       Future.delayed(Duration.zero, () {

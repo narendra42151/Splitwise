@@ -62,9 +62,10 @@ class _GroupScreenState extends State<GroupScreen> {
                     ? SizedBox()
                     : TextField(
                         controller: groupName,
-                        decoration: InputDecoration(hintText: "Group Name"),
+                        decoration:
+                            const InputDecoration(hintText: "Group Name"),
                       ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 TextField(
@@ -121,8 +122,8 @@ class _GroupScreenState extends State<GroupScreen> {
                         onChanged: (value) async {
                           if (value == true) {
                             try {
-                              final message = await groupController
-                                  .validateContact(contact, context);
+                              await groupController.validateContact(
+                                  contact, context);
                               // Show success message
 
                               showCustomSnackBar(context, "Added Contact");
@@ -180,7 +181,7 @@ class _GroupScreenState extends State<GroupScreen> {
               },
               child: Obx(() {
                 return groupController.isLoading.value
-                    ? SizedBox(
+                    ? const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(

@@ -37,13 +37,10 @@ class AuthController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -65,13 +62,10 @@ class AuthController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -109,14 +103,10 @@ class AuthController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       } else if (e is Exception) {
-        print("Generic Exception");
-
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -140,16 +130,12 @@ class AuthController extends GetxController {
       error.value = e.toString();
 
       if (e is AppException) {
-        print("App Exception: ${e.getType()}");
         ErrorHandler.handleError(e, context);
       }
       // Then check for general Exception
       else if (e is Exception) {
-        print("Generic Exception");
-
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {
@@ -169,7 +155,6 @@ class AuthController extends GetxController {
       final userDetails = await _repository.getUserDetails();
 
       user.value = userDetails;
-      print(user.value.toString());
 
       if (user.value == null) {
         Get.toNamed("/login");
@@ -192,10 +177,8 @@ class AuthController extends GetxController {
                     : true,
                 server: true));
       } else if (e is Exception) {
-        print("Generic Exception");
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
-        print("Non-Exception error: $e");
         ErrorHandler.handleError(e, context);
       }
     } finally {

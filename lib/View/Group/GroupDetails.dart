@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
@@ -14,7 +16,7 @@ import 'package:splitwise/ViewModel/Controller/Undefined.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   final String groupId;
-  GroupDetailsScreen({required this.groupId, super.key});
+  const GroupDetailsScreen({required this.groupId, super.key});
 
   @override
   State<StatefulWidget> createState() => _GroupDetailsScreenState();
@@ -66,7 +68,6 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   void connect(Groupdetailcontroller controller) {
     userId = controller.authController.user.value!.userId ?? "";
-    print("User ID: $userId");
 
     socket = IO.io("${SOCKETPROD}", <String, dynamic>{
       "transports": ['websocket'],
@@ -74,11 +75,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     });
 
     socket.onConnectError((data) {
-      print("Socket Connection Error: $data");
+      log("${data}");
     });
 
     socket.onError((data) {
-      print("Socket General Error: $data");
+      log("${data}");
     });
 
     socket.connect();
@@ -141,7 +142,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<Groupdetailcontroller>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -150,8 +151,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             onPressed: () {
               Get.toNamed('/groupScreenList');
             },
-            icon: Icon(Icons.arrow_back)),
-        title: Text(
+            icon: const Icon(Icons.arrow_back)),
+        title: const Text(
           'Group Details',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -163,7 +164,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               delegate: ExpenseSearchDelegate(controller),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           IconButton(
@@ -184,9 +185,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       ),
       floatingActionButton: Obx(() {
         return controller.isMessageActive.value
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -209,8 +211,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                         Get.to(
                             () => AmountInputScreen(groupId: widget.groupId));
                       },
-                      icon: Icon(Icons.group_add),
-                      label: Text('Split Expense'),
+                      icon: const Icon(Icons.group_add),
+                      label: const Text('Split Expense'),
                       backgroundColor: AppColors.lightPrimaryColor,
                     ),
                   ],
@@ -223,7 +225,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Widget _buildExpenseList(Groupdetailcontroller controller) {
     return Obx(() {
       if (controller.isLoading.value && controller.mergedList.isEmpty) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       }
 
       if (controller.mergedList.isEmpty) {
@@ -254,7 +256,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         children: [
           ListView.builder(
             controller: _scrollController,
-            padding: EdgeInsets.only(bottom: 80),
+            padding: const EdgeInsets.only(bottom: 80),
             itemCount: controller.mergedList.length,
             itemBuilder: (context, index) {
               final unifiedItem = controller.mergedList[index];
@@ -280,12 +282,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   child: _buildMessageBubble(message, isCurrentUserMessage),
                 );
               } else {
-                return SizedBox.shrink(); // Handle unexpected types
+                return const SizedBox.shrink(); // Handle unexpected types
               }
             },
           ),
           if (controller.isLoading.value && !controller.mergedList.isEmpty)
-            Positioned(
+            const Positioned(
               bottom: 16.0,
               left: 0,
               right: 0,
@@ -313,8 +315,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
   Widget _buildMessageBubble(MessageGet message, bool isCurrentUser) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isCurrentUser ? AppColors.darkPrimaryColor : Colors.grey[200],
         borderRadius: BorderRadius.circular(12),
@@ -329,7 +331,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               color: isCurrentUser ? Colors.white : Colors.black,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'Sent by: ${message.createdBy?.username ?? 'Unknown'}',
             style: TextStyle(
@@ -345,7 +347,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
   Widget _buildMessageInput(Groupdetailcontroller controller) {
     return Obx(() {
       if (!controller.isMessageActive.value) {
-        return SizedBox.shrink(); // Hide the input field if not active
+        return const SizedBox.shrink(); // Hide the input field if not active
       }
 
       return Container(
@@ -363,11 +365,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
           children: [
             IconButton(
               onPressed: () {
-                print("Back button pressed. Setting isMessageActive to false.");
                 controller.isMessageActive.value = false;
-                print("isMessageActive: ${controller.isMessageActive.value}");
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_left,
                 color: Colors.blueGrey,
               ),
@@ -376,12 +376,12 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               child: TextField(
                 controller: messageController,
                 focusNode: messageFocusNode,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Type a message...',
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
-                  if (value == "" || value == null) {
+                  if (value == "") {
                   } else {
                     controller.isSendShow.value = true;
                   }
@@ -390,7 +390,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
             ),
             if (controller.isSendShow.value)
               IconButton(
-                icon: Icon(Icons.send, color: AppColors.darkPrimaryColor),
+                icon: const Icon(Icons.send, color: AppColors.darkPrimaryColor),
                 onPressed: () {
                   List<String> memberIds = controller
                           .groupDetails.value?.members
@@ -429,7 +429,7 @@ class ExpenseSearchDelegate extends SearchDelegate {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () => close(context, null),
     );
   }
@@ -455,8 +455,8 @@ class ExpenseSearchDelegate extends SearchDelegate {
                 size: 64,
                 color: Colors.blue.withOpacity(0.5),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'No results found',
                 style: TextStyle(
                   fontSize: 18,
@@ -473,10 +473,10 @@ class ExpenseSearchDelegate extends SearchDelegate {
         itemBuilder: (context, index) {
           final expense = controller.searchResults[index];
           return Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ListTile(
-              contentPadding: EdgeInsets.all(16),
-              leading: CircleAvatar(
+              contentPadding: const EdgeInsets.all(16),
+              leading: const CircleAvatar(
                 backgroundColor: AppColors.darkPrimaryColor,
                 child: Icon(
                   Icons.receipt,
@@ -485,11 +485,11 @@ class ExpenseSearchDelegate extends SearchDelegate {
               ),
               title: Text(
                 expense.expenseDetails!.description ?? "",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
                 'Amount: ₹${expense.expenseDetails!.amount ?? 'N/A'}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.darkPrimaryColor,
                   fontWeight: FontWeight.w500,
                 ),

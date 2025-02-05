@@ -57,12 +57,12 @@ class PaymentRequestScreen extends StatelessWidget {
                     tag: 'profile_${creator?.username}',
                     child: CircleAvatar(
                       radius: 40,
-                      backgroundImage: AssetImage('assets/me.png'),
+                      backgroundImage: const AssetImage('assets/me.png'),
                       backgroundColor:
                           Theme.of(context).colorScheme.primaryContainer,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +74,7 @@ class PaymentRequestScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           '₹${totalAmount.toStringAsFixed(2)}',
                           style: Theme.of(context)
@@ -85,12 +85,12 @@ class PaymentRequestScreen extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
-                            Icon(Icons.check_circle,
+                            const Icon(Icons.check_circle,
                                 color: Colors.green, size: 20),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               'You paid',
                               style: Theme.of(context)
@@ -165,9 +165,9 @@ class PaymentRequestScreen extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         if (isPaid)
-                          Icon(Icons.check_circle,
+                          const Icon(Icons.check_circle,
                               color: Colors.green, size: 20),
                       ],
                     ),
@@ -183,7 +183,8 @@ class PaymentRequestScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor.withOpacity(0.5),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -210,11 +211,11 @@ class PaymentRequestScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Handle payment confirmation
-         
+
           showCustomSnackBar(context, 'Payment request confirmed');
         },
-        label: Text('Confirm Payment'),
-        icon: Icon(Icons.check),
+        label: const Text('Confirm Payment'),
+        icon: const Icon(Icons.check),
       ),
     );
   }

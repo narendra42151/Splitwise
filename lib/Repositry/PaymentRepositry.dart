@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/data/AppException.dart';
 import 'package:splitwise/data/Network/network_api.dart';
@@ -51,10 +49,7 @@ class Paymentrepositry {
 
         // Check if the response is already a Map
         if (response is Map) {
-          print("Response as Map: $response"); // If response is parsed
-        } else {
-          print("Raw Response: ${response.toString()}");
-        }
+        } else {}
 
         if (response['statusCode'] == 200) {
           final responseData = response;
@@ -64,7 +59,6 @@ class Paymentrepositry {
           throw Exception(response['message'] ?? 'Failed to fetch balance ID');
         }
       } catch (e) {
-        print("Error in postApiWithHeaders: $e");
         if (e is AppException) {
           throw e; // Re-throw AppException
         } else {
@@ -73,7 +67,6 @@ class Paymentrepositry {
         // Optional, propagate the exception
       }
     } catch (e) {
-      print("General Exception: $e");
       if (e is AppException) {
         throw e; // Re-throw AppException
       } else {

@@ -20,14 +20,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   // Function to check user session and navigate accordingly
   Future<void> _checkUserSession() async {
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     final accessToken = await SecureTokenManager()
         .getAccessToken(); // Get the saved access token
 
     if (accessToken != null) {
       // If there's an access token, attempt to fetch user details
       try {
-        final user = await authController.getUserDetails(context);
+        await authController.getUserDetails(context);
       } catch (error) {
         Get.offAllNamed('/login');
       }
@@ -84,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   },
                 ),
 
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
 
                 // App Name Animation
                 TweenAnimationBuilder<double>(
@@ -110,19 +110,19 @@ class _SplashScreenState extends State<SplashScreen> {
                   },
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Tagline Animation
                 DelayedTweenAnimation(
-                  delay: Duration(milliseconds: 500),
-                  duration: Duration(milliseconds: 1000),
+                  delay: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 1000),
                   curve: Curves.easeOut,
                   builder: (context, value) {
                     return Opacity(
                       opacity: value,
                       child: Transform.translate(
                         offset: Offset(0, 20 * (1 - value)),
-                        child: Text(
+                        child: const Text(
                           'Smart Payments Made Simple',
                           style: TextStyle(
                             color: Colors.white70,
@@ -135,12 +135,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   },
                 ),
 
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
 
                 // Loading Indicator Animation
                 DelayedTweenAnimation(
-                  delay: Duration(milliseconds: 1000),
-                  duration: Duration(milliseconds: 800),
+                  delay: const Duration(milliseconds: 1000),
+                  duration: const Duration(milliseconds: 800),
                   builder: (context, value) {
                     return Opacity(
                       opacity: value,
@@ -187,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen> {
       width: 100,
       child: TweenAnimationBuilder<double>(
         tween: Tween<double>(begin: 0, end: 1),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         curve: Curves.easeInOut,
         builder: (context, value, child) {
           return Column(
@@ -195,12 +195,12 @@ class _SplashScreenState extends State<SplashScreen> {
               LinearProgressIndicator(
                 value: value,
                 backgroundColor: Colors.white24,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 '${(value * 100).toInt()}%',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 12,
                 ),
