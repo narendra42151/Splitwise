@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-import 'package:splitwise/Utils/Utils.dart';
+import 'package:splitwise/data/URLS.dart';
 
 import 'package:splitwise/data/AppException.dart';
 import 'package:splitwise/data/Network/base_api_services.dart';

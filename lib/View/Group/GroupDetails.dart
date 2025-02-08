@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:splitwise/Models/ExpenseModel.dart';
 import 'package:splitwise/Models/GetMessage.dart';
 import 'package:splitwise/Models/GroupModel.dart';
-import 'package:splitwise/Utils/Utils.dart';
+import 'package:splitwise/data/URLS.dart';
 import 'package:splitwise/View/Group/AmountScreen.dart';
 import 'package:splitwise/View/Group/CardSplit.dart';
 import 'package:splitwise/View/Group/PaymentDetailScreen.dart';
