@@ -6,10 +6,12 @@ import 'package:splitwise/Repositry/Auth.repositry.dart';
 import 'package:splitwise/Utils/CustomException.dart';
 import 'package:splitwise/Utils/Errorhandler.dart';
 import 'package:splitwise/Utils/SnackBar.dart';
+import 'package:splitwise/Utils/TokenFile.dart';
 import 'package:splitwise/data/AppException.dart';
 
 class AuthController extends GetxController {
   final AuthRepository _repository = AuthRepository();
+  final _tokenManager = SecureTokenManager();
 
   final Rx<UserModel?> user = Rx<UserModel?>(null);
   final RxBool isLoading = false.obs;
@@ -147,6 +149,71 @@ class AuthController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
+  // Future<dynamic> getUserDetails(BuildContext context) async {
+  //   try {
+  //     isLoading.value = true;
+  //     error.value = '';
+
+  //     final userDetails = await _repository.getUserDetails();
+
+  //     user.value = userDetails;
+
+  //     if (user.value == null) {
+  //       Get.toNamed("/login");
+  //     } else {
+  //       Get.offAllNamed('/home');
+  //     }
+
+  //     return user.value;
+  //   } catch (e) {
+  //     error.value = e.toString();
+
+  //     if (e is AppException) {
+  //       print("App Exception: ${e.getType()}");
+  //       print(e.getType().toString());
+  //       e.getType().toString() == "UnauthorizedException"
+  //           ? Get.toNamed("/login")
+  //           : Get.to(() => ServerDownScreen(
+  //               isLogin: e.getType().toString() == "UnauthorizedException"
+  //                   ? false
+  //                   : true,
+  //               server: true));
+  //     } else if (e is Exception) {
+  //       ErrorHandler.handleError(CustomException(error.value), context);
+  //     } else {
+  //       ErrorHandler.handleError(e, context);
+  //     }
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  // Future<dynamic> refreshToken(BuildContext context) async {
+  //   try {
+  //     isLoading.value = true;
+  //     error.value = '';
+
+  //     final userDetails = await _repository.userRefreshToken();
+
+  //     print(userDetails);
+
+  //     return user.value;
+  //   } catch (e) {
+  //     error.value = e.toString();
+
+  //     if (e is AppException) {
+  //       ErrorHandler.handleError(e, context);
+  //     }
+  //     // Then check for general Exception
+  //     else if (e is Exception) {
+  //       ErrorHandler.handleError(CustomException(error.value), context);
+  //     } else {
+  //       ErrorHandler.handleError(e, context);
+  //     }
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
   Future<dynamic> getUserDetails(BuildContext context) async {
     try {
       isLoading.value = true;
@@ -169,18 +236,62 @@ class AuthController extends GetxController {
       if (e is AppException) {
         print("App Exception: ${e.getType()}");
         print(e.getType().toString());
-        e.getType().toString() == "UnauthorizedException"
-            ? Get.toNamed("/login")
-            : Get.to(() => ServerDownScreen(
-                isLogin: e.getType().toString() == "UnauthorizedException"
-                    ? false
-                    : true,
-                server: true));
+        if (e.getType().toString() == "UnauthorizedException") {
+          // Call refreshToken when unauthorized
+          print("1 go for rft");
+          bool refreshSuccess = await refreshToken(context);
+          if (refreshSuccess) {
+            // If refreshToken is successful, call getUserDetails again
+            print("2 ");
+            return await getUserDetails(context);
+          } else {
+            // If refreshToken fails, navigate to login screen
+            Get.toNamed("/login");
+          }
+        } else {
+          Get.to(() => ServerDownScreen(
+              isLogin: e.getType().toString() == "UnauthorizedException"
+                  ? false
+                  : true,
+              server: true));
+        }
       } else if (e is Exception) {
         ErrorHandler.handleError(CustomException(error.value), context);
       } else {
         ErrorHandler.handleError(e, context);
       }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> refreshToken(BuildContext context) async {
+    try {
+      isLoading.value = true;
+      error.value = '';
+
+      final tokens = await _repository.userRefreshToken();
+      await _tokenManager.saveTokens(
+          tokens["accessToken"], tokens["refreshTokens"]);
+
+      // Assuming userDetails contains the new token and user is now authorized
+      // You might want to update the user value or token here
+
+      return true; // Return true if refresh is successful
+    } catch (e) {
+      error.value = e.toString();
+
+      if (e is AppException) {
+        ErrorHandler.handleError(e, context);
+      }
+      // Then check for general Exception
+      else if (e is Exception) {
+        ErrorHandler.handleError(CustomException(error.value), context);
+      } else {
+        ErrorHandler.handleError(e, context);
+      }
+
+      return false; // Return false if refresh fails
     } finally {
       isLoading.value = false;
     }

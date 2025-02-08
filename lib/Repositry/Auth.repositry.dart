@@ -159,4 +159,44 @@ class AuthRepository {
       }
     }
   }
+
+  Future<dynamic> userRefreshToken() async {
+    try {
+      final refreshToken = await _tokenManager.getRefreshToken();
+
+      final Map<String, String> headers = {
+        'refresh_token': 'Bearer $refreshToken',
+        'Content-Type': 'application/json',
+      };
+
+      final response =
+          await _apiServices.getApiWithHeaders('/refresh-token', headers);
+      print(response.toString());
+
+      final Map<String, dynamic>? jsonResponse =
+          response as Map<String, dynamic>?;
+
+      if (jsonResponse == null || !jsonResponse.containsKey('data')) {
+        throw Exception('Invalid response format');
+      }
+
+      final tokens = jsonResponse['data'];
+      print(tokens);
+      if (tokens == null) {
+        throw Exception('No Refresh Token');
+      }
+
+      if (jsonResponse["message"] == "Token refreshed successfully") {
+        return tokens;
+      }
+
+      throw Exception("Some Error Occurred");
+    } catch (e) {
+      if (e is AppException) {
+        throw e; // Re-throw AppException
+      } else {
+        throw Exception('Failed to Referesh Token: $e');
+      }
+    }
+  }
 }
