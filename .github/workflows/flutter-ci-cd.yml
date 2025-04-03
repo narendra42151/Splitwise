@@ -6,26 +6,51 @@ on:
       - main
 
 jobs:
-  build_and_package:
-    name: Build and Store APK
+  android_instrumentation_tests:
+    name: Android Instrumentation Testing
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.19.6"
-          dart-version: "3.3.4"
+          flutter-version: "3.27.2"
+          channel: "stable"
 
-      - name: Get Dependencies
-        run: flutter pub get
+      - run: sleep 30
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Check KVM status
+        run: |
+          lsmod | grep kvm
 
-      - name: Upload APK Artifact
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: |
+            flutter devices
+            adb shell input keyevent 82
+            flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+
+  packaging:
+    name: Packaging
+    runs-on: ubuntu-latest
+    needs: [android_instrumentation_tests] # Removed undefined ios_instrumentation_tests
+    steps:
+      - uses: actions/checkout@v4 # Updated from v3 to v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.2"
+      - run: flutter build apk --release
+      - name: Upload APK to GitHub Packages
         uses: actions/upload-artifact@v3
         with:
           name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk # Removed trailing text
