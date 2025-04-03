@@ -27,14 +27,24 @@ jobs:
 
       - name: Setup KVM
         run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-kvm
+          sudo chown $USER /dev/kvm
           sudo chmod 666 /dev/kvm
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
 
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.27.2"
           channel: "stable"
+
+      - name: Install Android Emulator
+        run: |
+          sdkmanager "system-images;android-29;google_apis;x86_64"
+          sdkmanager "platform-tools" "emulator"
+          echo "y" | avdmanager create avd \
+            -n test \
+            -k "system-images;android-29;google_apis;x86_64" \
+            -d "Nexus 6"
 
       - name: Run Integration Tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -43,28 +53,19 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           disable-animations: true
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
-            echo "=== Starting emulator setup ==="
-            flutter devices
-            adb wait-for-device
-            echo "Waiting for device to fully boot..."
-            sleep 60
-            adb shell input keyevent 82
-
-            echo "=== Checking for integration tests ==="
-            if [ -f "integration_test/app_test.dart" ]; then
-              echo "Running integration tests..."
-              flutter drive \
-                --driver=test_driver/integration_test.dart \
-                --target=integration_test/app_test.dart \
-                --device-timeout 5m
-            else
-              echo "No integration tests found at integration_test/app_test.dart"
-            fi
-
-            echo "=== Test execution completed ==="
+            echo "=== Starting emulator ==="
+            flutter emulators
             adb devices
-            adb logcat -d
+
+            echo "=== Waiting for device ==="
+            adb wait-for-device
+            while [ "`adb shell getprop sys.boot_completed | tr -d '\r' `" != "1" ] ; do sleep 5; done
+
+            echo "=== Unlocking device ==="
+            adb shell input keyevent 82
 
   packaging:
     name: Build and Package
